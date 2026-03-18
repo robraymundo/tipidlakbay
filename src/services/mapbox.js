@@ -30,6 +30,34 @@ export async function geocodePlace(query) {
   };
 }
 
+export async function getPlaceSuggestions(query) {
+  if (!query?.trim() || query.trim().length < 2) {
+    return [];
+  }
+
+  const encodedQuery = encodeURIComponent(query.trim());
+
+  const url = `https://api.mapbox.com/search/geocode/v6/forward?q=${encodedQuery}&autocomplete=true&limit=5&access_token=${MAPBOX_TOKEN}`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error("Failed to fetch place suggestions.");
+  }
+
+  const data = await response.json();
+
+  return (data.features || []).map((place) => {
+    const [lng, lat] = place.geometry.coordinates;
+
+    return {
+      id: place.id,
+      name: place.properties?.full_address || place.properties?.name || "Unknown place",
+      lng,
+      lat,
+    };
+  });
+}
+
 export async function getRoutes(originCoords, destinationCoords) {
   const { lng: originLng, lat: originLat } = originCoords;
   const { lng: destLng, lat: destLat } = destinationCoords;

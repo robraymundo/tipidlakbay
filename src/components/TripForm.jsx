@@ -373,7 +373,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
             onChange={handleChange}
             placeholder="e.g. 14"
             min="1"
-            step="0.1"
+            step="1"
             className={getInputClass("fuelEfficiency")}
           />
           {errors.fuelEfficiency && (
@@ -392,7 +392,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
             onChange={handleChange}
             placeholder="e.g. 65"
             min="0"
-            step="0.01"
+            step="1"
             className={getInputClass("fuelPrice")}
           />
           {errors.fuelPrice && (

@@ -5,7 +5,7 @@ const vehicleOptions = [
   { label: "Truck", value: "truck", defaultEfficiency: 8 },
 ];
 
-function TripForm({ tripData, setTripData, darkMode, onCalculate }) {
+function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
 
@@ -27,7 +27,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate }) {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (
@@ -40,7 +40,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate }) {
       return;
     }
 
-    onCalculate();
+    await onCalculate();
   };
 
   const inputClass = `w-full rounded-xl border px-4 py-3 outline-none transition ${
@@ -59,7 +59,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate }) {
 
       <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-medium">Starting Point</label>
+          <label className="mb-1 block text-sm font-medium">Origin</label>
           <input
             type="text"
             name="origin"
@@ -129,17 +129,35 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate }) {
             className={inputClass}
           />
         </div>
+        
+        <div className="md:col-span-2">
+          <label
+            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${
+              darkMode ? "bg-slate-800" : "bg-slate-50"
+            }`}
+          >
+            <input
+              type="checkbox"
+              name="roundTrip"
+              checked={tripData.roundTrip}
+              onChange={handleChange}
+              className="h-4 w-4"
+            />
+            Compute as round trip
+          </label>
+        </div>
 
         <div className="md:col-span-2">
           <button
             type="submit"
+            disabled={loading}
             className={`w-full rounded-xl px-4 py-3 font-semibold transition ${
               darkMode
-                ? "bg-white text-slate-900 hover:bg-slate-200"
-                : "bg-slate-900 text-white hover:bg-slate-700"
+                ? "bg-white text-slate-900 hover:bg-slate-200 disabled:bg-slate-300"
+                : "bg-slate-900 text-white hover:bg-slate-700 disabled:bg-slate-400"
             }`}
           >
-            Calculate Trip
+            {loading ? "Calculating..." : "Calculate Trip"}
           </button>
         </div>
       </form>

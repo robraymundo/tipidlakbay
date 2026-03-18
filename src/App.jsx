@@ -2,12 +2,15 @@ import { useMemo, useState } from "react";
 import TripForm from "./components/TripForm";
 import RouteCard from "./components/RouteCard";
 import CostSummary from "./components/CostSummary";
-import routes from "./data/routes";
 import { calculateTripCost } from "./utils/calculateTrip";
+import { geocodePlace, getRoutes } from "./services/mapbox";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [hasCalculated, setHasCalculated] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [routeError, setRouteError] = useState("");
+  const [liveRoutes, setLiveRoutes] = useState([]);
 
   const [tripData, setTripData] = useState({
     origin: "",
@@ -20,31 +23,58 @@ function App() {
     roundTrip: false,
   });
 
+  const handleCalculate = async () => {
+    try {
+      setLoading(true);
+      setRouteError("");
+      setHasCalculated(false);
+
+      const originCoords = await geocodePlace(tripData.origin);
+      const destinationCoords = await geocodePlace(tripData.destination);
+
+      const fetchedRoutes = await getRoutes(originCoords, destinationCoords);
+
+      const labeledRoutes = fetchedRoutes.map((route, index) => ({
+        ...route,
+        label:
+          index === 0
+            ? "Recommended Route"
+            : index === 1
+            ? "Alternative Route"
+            : "Extra Route",
+      }));
+
+      setLiveRoutes(labeledRoutes);
+      setHasCalculated(true);
+    } catch (error) {
+      console.error(error);
+      setRouteError(error.message || "Unable to calculate trip.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const computedRoutes = useMemo(() => {
     const fuelEfficiency = Number(tripData.fuelEfficiency);
     const fuelPrice = Number(tripData.fuelPrice);
     const tollFee = Number(tripData.tollFee || 0);
     const parkingFee = Number(tripData.parkingFee || 0);
 
-    if (!fuelEfficiency || !fuelPrice) {
-      return routes.map((route) => ({
-        ...route,
-        result: null,
-      }));
-    }
-
-    return routes.map((route) => ({
+    return liveRoutes.map((route) => ({
       ...route,
-      result: calculateTripCost(
-        route.distance,
-        fuelEfficiency,
-        fuelPrice,
-        tollFee,
-        parkingFee,
-        tripData.roundTrip
-      ),
+      result:
+        fuelEfficiency && fuelPrice
+          ? calculateTripCost(
+              route.distance,
+              fuelEfficiency,
+              fuelPrice,
+              tollFee,
+              parkingFee,
+              tripData.roundTrip
+            )
+          : null,
     }));
-  }, [tripData]);
+  }, [liveRoutes, tripData]);
 
   const cheapestRouteId = useMemo(() => {
     const validRoutes = computedRoutes.filter((route) => route.result);
@@ -58,16 +88,20 @@ function App() {
   }, [computedRoutes]);
 
   const fastestRouteId = useMemo(() => {
-    return routes.reduce((fastest, current) =>
+    if (!computedRoutes.length) return null;
+
+    return computedRoutes.reduce((fastest, current) =>
       current.duration < fastest.duration ? current : fastest
     ).id;
-  }, []);
+  }, [computedRoutes]);
 
   const mostEfficientRouteId = useMemo(() => {
-    return routes.reduce((best, current) =>
+    if (!computedRoutes.length) return null;
+
+    return computedRoutes.reduce((best, current) =>
       current.distance < best.distance ? current : best
     ).id;
-  }, []);
+  }, [computedRoutes]);
 
   const selectedSummary = useMemo(() => {
     if (!hasCalculated) return null;
@@ -111,7 +145,8 @@ function App() {
             tripData={tripData}
             setTripData={setTripData}
             darkMode={darkMode}
-            onCalculate={() => setHasCalculated(true)}
+            onCalculate={handleCalculate}
+            loading={loading}
           />
 
           <div className="space-y-6">
@@ -124,7 +159,17 @@ function App() {
             >
               <h2 className="mb-4 text-xl font-semibold">Route Comparison</h2>
 
-              {!hasCalculated ? (
+              {routeError ? (
+                <div
+                  className={`rounded-xl p-4 text-sm ${
+                    darkMode
+                      ? "bg-red-950 text-red-200"
+                      : "bg-red-50 text-red-700"
+                  }`}
+                >
+                  {routeError}
+                </div>
+              ) : loading ? (
                 <div
                   className={`rounded-xl p-4 text-sm ${
                     darkMode
@@ -132,9 +177,17 @@ function App() {
                       : "bg-slate-50 text-slate-600"
                   }`}
                 >
-                  Fill in the trip details and click{" "}
-                  <span className="font-semibold">Calculate Trip</span> to see
-                  route options.
+                  Calculating routes...
+                </div>
+              ) : !hasCalculated ? (
+                <div
+                  className={`rounded-xl p-4 text-sm ${
+                    darkMode
+                      ? "bg-slate-800 text-slate-300"
+                      : "bg-slate-50 text-slate-600"
+                  }`}
+                >
+                  Fill in the trip details and click <span className="font-semibold">Calculate Trip</span>.
                 </div>
               ) : (
                 <div className="grid gap-4">
@@ -157,8 +210,7 @@ function App() {
               selectedSummary={selectedSummary}
               cheapestRoute={
                 hasCalculated
-                  ? computedRoutes.find((route) => route.id === cheapestRouteId) ||
-                    null
+                  ? computedRoutes.find((route) => route.id === cheapestRouteId) || null
                   : null
               }
               darkMode={darkMode}

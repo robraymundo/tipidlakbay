@@ -12,6 +12,30 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
   const [activeField, setActiveField] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!tripData.origin.trim()) {
+      newErrors.origin = "Please enter a starting point.";
+    }
+
+    if (!tripData.destination.trim()) {
+      newErrors.destination = "Please enter a destination.";
+    }
+
+    if (!tripData.fuelEfficiency || Number(tripData.fuelEfficiency) <= 0) {
+      newErrors.fuelEfficiency = "Please enter a valid fuel efficiency.";
+    }
+
+    if (!tripData.fuelPrice || Number(tripData.fuelPrice) <= 0) {
+      newErrors.fuelPrice = "Please enter a valid fuel price.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -20,6 +44,13 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
 
     if (name === "origin" || name === "destination") {
       setActiveField(name);
@@ -36,6 +67,29 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
       vehicleType: event.target.value,
       fuelEfficiency: selectedVehicle.defaultEfficiency.toString(),
     }));
+
+    if (errors.fuelEfficiency) {
+      setErrors((prev) => ({
+        ...prev,
+        fuelEfficiency: "",
+      }));
+    }
+  };
+
+  const clearField = (fieldName) => {
+    setTripData((prev) => ({
+      ...prev,
+      [fieldName]: "",
+    }));
+    setSuggestions([]);
+    setActiveField(fieldName);
+
+    if (errors[fieldName]) {
+      setErrors((prev) => ({
+        ...prev,
+        [fieldName]: "",
+      }));
+    }
   };
 
   const handleSuggestionClick = (fieldName, placeName) => {
@@ -45,20 +99,20 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
     }));
     setSuggestions([]);
     setActiveField(null);
+
+    if (errors[fieldName]) {
+      setErrors((prev) => ({
+        ...prev,
+        [fieldName]: "",
+      }));
+    }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (
-      !tripData.origin.trim() ||
-      !tripData.destination.trim() ||
-      !tripData.fuelEfficiency ||
-      !tripData.fuelPrice
-    ) {
-      alert("Please complete the required fields first.");
-      return;
-    }
+    const isValid = validateForm();
+    if (!isValid) return;
 
     await onCalculate();
   };
@@ -92,11 +146,17 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
     return () => clearTimeout(timeoutId);
   }, [tripData.origin, tripData.destination, activeField]);
 
-  const inputClass = `w-full rounded-xl border px-4 py-3 outline-none transition ${
-    darkMode
-      ? "border-slate-700 bg-slate-800 text-white placeholder:text-slate-400 focus:border-slate-500"
-      : "border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-slate-500"
-  }`;
+  const baseInputClass = `w-full rounded-xl border px-4 py-3 outline-none transition`;
+  const defaultInputClass = darkMode
+    ? "border-slate-700 bg-slate-800 text-white placeholder:text-slate-400 focus:border-slate-500"
+    : "border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-slate-500";
+
+  const errorInputClass = "border-red-500 focus:border-red-500";
+
+  const getInputClass = (fieldName, extra = "") =>
+    `${baseInputClass} ${
+      errors[fieldName] ? errorInputClass : defaultInputClass
+    } ${extra}`;
 
   const dropdownClass = `absolute z-20 mt-2 w-full overflow-hidden rounded-xl border shadow-lg ${
     darkMode
@@ -110,15 +170,8 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
       : "text-slate-700 hover:bg-slate-50"
   }`;
 
-  const clearField = (fieldName) => {
-  setTripData((prev) => ({
-    ...prev,
-    [fieldName]: "",
-  }));
-  setSuggestions([]);
-  setActiveField(fieldName);
-  };
-  
+  const errorTextClass = "mt-1 text-sm text-red-500";
+
   return (
     <section
       className={`rounded-2xl p-5 shadow-sm ring-1 ${
@@ -139,7 +192,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
               onChange={handleChange}
               onFocus={() => setActiveField("origin")}
               placeholder="e.g. Quezon City"
-              className={`${inputClass} pr-14`}
+              className={getInputClass("origin", "pr-12")}
               autoComplete="off"
             />
 
@@ -147,7 +200,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
               <button
                 type="button"
                 onClick={() => clearField("origin")}
-                className={`absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full transition ${
+                className={`absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition ${
                   darkMode
                     ? "text-slate-200 hover:bg-slate-700 hover:text-white"
                     : "text-slate-500 hover:bg-slate-200 hover:text-slate-900"
@@ -162,7 +215,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="h-5 w-5"
+                  className="h-4 w-4"
                 >
                   <path d="M18 6 6 18" />
                   <path d="m6 6 12 12" />
@@ -171,24 +224,27 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
             )}
           </div>
 
-          {activeField === "origin" && (suggestions.length > 0 || isFetchingSuggestions) && (
-            <div className={dropdownClass}>
-              {isFetchingSuggestions ? (
-                <div className={dropdownItemClass}>Searching places...</div>
-              ) : (
-                suggestions.map((place) => (
-                  <button
-                    key={place.id}
-                    type="button"
-                    className={dropdownItemClass}
-                    onClick={() => handleSuggestionClick("origin", place.name)}
-                  >
-                    {place.name}
-                  </button>
-                ))
-              )}
-            </div>
-          )}
+          {errors.origin && <p className={errorTextClass}>{errors.origin}</p>}
+
+          {activeField === "origin" &&
+            (suggestions.length > 0 || isFetchingSuggestions) && (
+              <div className={dropdownClass}>
+                {isFetchingSuggestions ? (
+                  <div className={dropdownItemClass}>Searching places...</div>
+                ) : (
+                  suggestions.map((place) => (
+                    <button
+                      key={place.id}
+                      type="button"
+                      className={dropdownItemClass}
+                      onClick={() => handleSuggestionClick("origin", place.name)}
+                    >
+                      {place.name}
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
         </div>
 
         <div className="relative md:col-span-2">
@@ -202,7 +258,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
               onChange={handleChange}
               onFocus={() => setActiveField("destination")}
               placeholder="e.g. Tagaytay"
-              className={`${inputClass} pr-14`}
+              className={getInputClass("destination", "pr-12")}
               autoComplete="off"
             />
 
@@ -210,7 +266,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
               <button
                 type="button"
                 onClick={() => clearField("destination")}
-                className={`absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full transition ${
+                className={`absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition ${
                   darkMode
                     ? "text-slate-200 hover:bg-slate-700 hover:text-white"
                     : "text-slate-500 hover:bg-slate-200 hover:text-slate-900"
@@ -225,7 +281,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="h-5 w-5"
+                  className="h-4 w-4"
                 >
                   <path d="M18 6 6 18" />
                   <path d="m6 6 12 12" />
@@ -234,24 +290,31 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
             )}
           </div>
 
-          {activeField === "destination" && (suggestions.length > 0 || isFetchingSuggestions) && (
-            <div className={dropdownClass}>
-              {isFetchingSuggestions ? (
-                <div className={dropdownItemClass}>Searching places...</div>
-              ) : (
-                suggestions.map((place) => (
-                  <button
-                    key={place.id}
-                    type="button"
-                    className={dropdownItemClass}
-                    onClick={() => handleSuggestionClick("destination", place.name)}
-                  >
-                    {place.name}
-                  </button>
-                ))
-              )}
-            </div>
+          {errors.destination && (
+            <p className={errorTextClass}>{errors.destination}</p>
           )}
+
+          {activeField === "destination" &&
+            (suggestions.length > 0 || isFetchingSuggestions) && (
+              <div className={dropdownClass}>
+                {isFetchingSuggestions ? (
+                  <div className={dropdownItemClass}>Searching places...</div>
+                ) : (
+                  suggestions.map((place) => (
+                    <button
+                      key={place.id}
+                      type="button"
+                      className={dropdownItemClass}
+                      onClick={() =>
+                        handleSuggestionClick("destination", place.name)
+                      }
+                    >
+                      {place.name}
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
         </div>
 
         <div>
@@ -260,7 +323,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
             name="vehicleType"
             value={tripData.vehicleType}
             onChange={handleVehicleChange}
-            className={inputClass}
+            className={getInputClass("vehicleType")}
           >
             {vehicleOptions.map((vehicle) => (
               <option key={vehicle.value} value={vehicle.value}>
@@ -282,8 +345,11 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
             placeholder="e.g. 14"
             min="1"
             step="0.1"
-            className={inputClass}
+            className={getInputClass("fuelEfficiency")}
           />
+          {errors.fuelEfficiency && (
+            <p className={errorTextClass}>{errors.fuelEfficiency}</p>
+          )}
         </div>
 
         <div>
@@ -298,15 +364,18 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
             placeholder="e.g. 65"
             min="0"
             step="0.01"
-            className={inputClass}
+            className={getInputClass("fuelPrice")}
           />
+          {errors.fuelPrice && (
+            <p className={errorTextClass}>{errors.fuelPrice}</p>
+          )}
         </div>
 
         <div className="md:col-span-2">
           <button
             type="submit"
             disabled={loading}
-            className={`w-full rounded-xl px-4 py-3 font-semibold transition ${
+            className={`w-full rounded-xl px-4 py-3 my-5 font-semibold transition ${
               darkMode
                 ? "bg-white text-slate-900 hover:bg-slate-200 disabled:bg-slate-300"
                 : "bg-slate-900 text-white hover:bg-slate-700 disabled:bg-slate-400"

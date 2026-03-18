@@ -91,7 +91,7 @@ function CostSummary({
         </div>
 
         <div className="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">
-          This estimate includes fuel cost, toll fee, and parking fee.
+           This estimate is based on route distance, fuel price, and vehicle fuel efficiency.
           {tripData.roundTrip ? " Round-trip mode is enabled." : ""}
         </div>
       </div>

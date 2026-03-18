@@ -7,12 +7,13 @@ import { calculateTripCost } from "./utils/calculateTrip";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
+  const [hasCalculated, setHasCalculated] = useState(false);
 
   const [tripData, setTripData] = useState({
     origin: "",
     destination: "",
-    vehicleType: "Sedan",
-    fuelEfficiency: "",
+    vehicleType: "car",
+    fuelEfficiency: "14",
     fuelPrice: "",
     tollFee: "",
     parkingFee: "",
@@ -69,9 +70,10 @@ function App() {
   }, []);
 
   const selectedSummary = useMemo(() => {
+    if (!hasCalculated) return null;
     const route = computedRoutes.find((item) => item.id === cheapestRouteId);
     return route?.result || null;
-  }, [computedRoutes, cheapestRouteId]);
+  }, [computedRoutes, cheapestRouteId, hasCalculated]);
 
   return (
     <main
@@ -82,9 +84,7 @@ function App() {
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold md:text-4xl">
-              TipidLakbay
-            </h1>
+            <h1 className="text-3xl font-bold md:text-4xl">TipidLakbay</h1>
             <p
               className={`mt-2 max-w-2xl ${
                 darkMode ? "text-slate-300" : "text-slate-600"
@@ -111,6 +111,7 @@ function App() {
             tripData={tripData}
             setTripData={setTripData}
             darkMode={darkMode}
+            onCalculate={() => setHasCalculated(true)}
           />
 
           <div className="space-y-6">
@@ -123,28 +124,45 @@ function App() {
             >
               <h2 className="mb-4 text-xl font-semibold">Route Comparison</h2>
 
-              <div className="grid gap-4">
-                {computedRoutes.map((route) => (
-                  <RouteCard
-                    key={route.id}
-                    route={route}
-                    isCheapest={route.id === cheapestRouteId}
-                    isFastest={route.id === fastestRouteId}
-                    isMostEfficient={route.id === mostEfficientRouteId}
-                    darkMode={darkMode}
-                  />
-                ))}
-              </div>
+              {!hasCalculated ? (
+                <div
+                  className={`rounded-xl p-4 text-sm ${
+                    darkMode
+                      ? "bg-slate-800 text-slate-300"
+                      : "bg-slate-50 text-slate-600"
+                  }`}
+                >
+                  Fill in the trip details and click{" "}
+                  <span className="font-semibold">Calculate Trip</span> to see
+                  route options.
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {computedRoutes.map((route) => (
+                    <RouteCard
+                      key={route.id}
+                      route={route}
+                      isCheapest={route.id === cheapestRouteId}
+                      isFastest={route.id === fastestRouteId}
+                      isMostEfficient={route.id === mostEfficientRouteId}
+                      darkMode={darkMode}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             <CostSummary
               tripData={tripData}
               selectedSummary={selectedSummary}
               cheapestRoute={
-                computedRoutes.find((route) => route.id === cheapestRouteId) ||
-                null
+                hasCalculated
+                  ? computedRoutes.find((route) => route.id === cheapestRouteId) ||
+                    null
+                  : null
               }
               darkMode={darkMode}
+              hasCalculated={hasCalculated}
             />
           </div>
         </div>

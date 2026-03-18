@@ -1,11 +1,11 @@
 const vehicleOptions = [
-  { label: "Motorcycle", value: "Motorcycle", defaultEfficiency: 35 },
-  { label: "Sedan", value: "Sedan", defaultEfficiency: 14 },
-  { label: "SUV", value: "SUV", defaultEfficiency: 10 },
-  { label: "Van", value: "Van", defaultEfficiency: 8 },
+  { label: "Motorcycle", value: "motorcycle", defaultEfficiency: 35 },
+  { label: "Car", value: "car", defaultEfficiency: 14 },
+  { label: "SUV", value: "suv", defaultEfficiency: 10 },
+  { label: "Truck", value: "truck", defaultEfficiency: 8 },
 ];
 
-function TripForm({ tripData, setTripData, darkMode }) {
+function TripForm({ tripData, setTripData, darkMode, onCalculate }) {
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
 
@@ -23,11 +23,24 @@ function TripForm({ tripData, setTripData, darkMode }) {
     setTripData((prev) => ({
       ...prev,
       vehicleType: event.target.value,
-      fuelEfficiency:
-        prev.fuelEfficiency && Number(prev.fuelEfficiency) > 0
-          ? prev.fuelEfficiency
-          : selectedVehicle.defaultEfficiency.toString(),
+      fuelEfficiency: selectedVehicle.defaultEfficiency.toString(),
     }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (
+      !tripData.origin.trim() ||
+      !tripData.destination.trim() ||
+      !tripData.fuelEfficiency ||
+      !tripData.fuelPrice
+    ) {
+      alert("Please complete the required fields first.");
+      return;
+    }
+
+    onCalculate();
   };
 
   const inputClass = `w-full rounded-xl border px-4 py-3 outline-none transition ${
@@ -44,15 +57,15 @@ function TripForm({ tripData, setTripData, darkMode }) {
     >
       <h2 className="mb-4 text-xl font-semibold">Trip Details</h2>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-medium">Origin</label>
+          <label className="mb-1 block text-sm font-medium">Starting Point</label>
           <input
             type="text"
             name="origin"
             value={tripData.origin}
             onChange={handleChange}
-            placeholder="e.g. Quezon City"
+            placeholder="e.g. Ilagan City"
             className={inputClass}
           />
         </div>
@@ -64,7 +77,7 @@ function TripForm({ tripData, setTripData, darkMode }) {
             name="destination"
             value={tripData.destination}
             onChange={handleChange}
-            placeholder="e.g. Tagaytay"
+            placeholder="e.g. Tuguegarao City"
             className={inputClass}
           />
         </div>
@@ -117,53 +130,19 @@ function TripForm({ tripData, setTripData, darkMode }) {
           />
         </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium">Toll Fee (₱)</label>
-          <input
-            type="number"
-            name="tollFee"
-            value={tripData.tollFee}
-            onChange={handleChange}
-            placeholder="e.g. 120"
-            min="0"
-            step="0.01"
-            className={inputClass}
-          />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium">
-            Parking Fee (₱)
-          </label>
-          <input
-            type="number"
-            name="parkingFee"
-            value={tripData.parkingFee}
-            onChange={handleChange}
-            placeholder="e.g. 50"
-            min="0"
-            step="0.01"
-            className={inputClass}
-          />
-        </div>
-
         <div className="md:col-span-2">
-          <label
-            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${
-              darkMode ? "bg-slate-800" : "bg-slate-50"
+          <button
+            type="submit"
+            className={`w-full rounded-xl px-4 py-3 font-semibold transition ${
+              darkMode
+                ? "bg-white text-slate-900 hover:bg-slate-200"
+                : "bg-slate-900 text-white hover:bg-slate-700"
             }`}
           >
-            <input
-              type="checkbox"
-              name="roundTrip"
-              checked={tripData.roundTrip}
-              onChange={handleChange}
-              className="h-4 w-4"
-            />
-            Compute as round trip
-          </label>
+            Calculate Trip
+          </button>
         </div>
-      </div>
+      </form>
     </section>
   );
 }

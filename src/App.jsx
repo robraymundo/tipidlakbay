@@ -11,6 +11,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [routeError, setRouteError] = useState("");
   const [liveRoutes, setLiveRoutes] = useState([]);
+  const [appliedTripData, setAppliedTripData] = useState(null);
 
   const [tripData, setTripData] = useState({
     origin: "",
@@ -29,8 +30,10 @@ function App() {
       setRouteError("");
       setHasCalculated(false);
 
-      const originCoords = await geocodePlace(tripData.origin);
-      const destinationCoords = await geocodePlace(tripData.destination);
+      const submittedTripData = { ...tripData };
+
+      const originCoords = await geocodePlace(submittedTripData.origin);
+      const destinationCoords = await geocodePlace(submittedTripData.destination);
 
       const fetchedRoutes = await getRoutes(originCoords, destinationCoords);
 
@@ -45,6 +48,7 @@ function App() {
       }));
 
       setLiveRoutes(labeledRoutes);
+      setAppliedTripData(submittedTripData);
       setHasCalculated(true);
     } catch (error) {
       console.error(error);
@@ -55,10 +59,12 @@ function App() {
   };
 
   const computedRoutes = useMemo(() => {
-    const fuelEfficiency = Number(tripData.fuelEfficiency);
-    const fuelPrice = Number(tripData.fuelPrice);
-    const tollFee = Number(tripData.tollFee || 0);
-    const parkingFee = Number(tripData.parkingFee || 0);
+    if (!appliedTripData) return [];
+
+    const fuelEfficiency = Number(appliedTripData.fuelEfficiency);
+    const fuelPrice = Number(appliedTripData.fuelPrice);
+    const tollFee = Number(appliedTripData.tollFee || 0);
+    const parkingFee = Number(appliedTripData.parkingFee || 0);
 
     return liveRoutes.map((route) => ({
       ...route,
@@ -70,11 +76,11 @@ function App() {
               fuelPrice,
               tollFee,
               parkingFee,
-              tripData.roundTrip
+              appliedTripData.roundTrip
             )
           : null,
     }));
-  }, [liveRoutes, tripData]);
+  }, [liveRoutes, appliedTripData]);
 
   const cheapestRouteId = useMemo(() => {
     const validRoutes = computedRoutes.filter((route) => route.result);
@@ -187,7 +193,8 @@ function App() {
                       : "bg-slate-50 text-slate-600"
                   }`}
                 >
-                  Fill in the trip details and click <span className="font-semibold">Calculate Trip</span>.
+                  Fill in the trip details and click{" "}
+                  <span className="font-semibold">Calculate Trip</span>.
                 </div>
               ) : (
                 <div className="grid gap-4">
@@ -206,11 +213,12 @@ function App() {
             </div>
 
             <CostSummary
-              tripData={tripData}
+              tripData={appliedTripData || tripData}
               selectedSummary={selectedSummary}
               cheapestRoute={
                 hasCalculated
-                  ? computedRoutes.find((route) => route.id === cheapestRouteId) || null
+                  ? computedRoutes.find((route) => route.id === cheapestRouteId) ||
+                    null
                   : null
               }
               darkMode={darkMode}

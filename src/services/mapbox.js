@@ -1,5 +1,24 @@
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
+function formatSuggestionName(place) {
+  const name = place.properties?.name || "Unknown place";
+  const placeFormatted = place.properties?.place_formatted || "";
+
+  const cleanedFormatted = placeFormatted
+    .replace(/,?\s*Philippines$/i, "")
+    .trim();
+
+  if (!cleanedFormatted) {
+    return name;
+  }
+
+  if (cleanedFormatted.toLowerCase() === name.toLowerCase()) {
+    return name;
+  }
+
+  return `${name}, ${cleanedFormatted}`;
+}
+
 export async function geocodePlace(query) {
   if (!query?.trim()) {
     throw new Error("Place query is required.");
@@ -7,7 +26,12 @@ export async function geocodePlace(query) {
 
   const encodedQuery = encodeURIComponent(query.trim());
 
-  const url = `https://api.mapbox.com/search/geocode/v6/forward?q=${encodedQuery}&limit=1&access_token=${MAPBOX_TOKEN}`;
+  const url =
+    `https://api.mapbox.com/search/geocode/v6/forward` +
+    `?q=${encodedQuery}` +
+    `&limit=1` +
+    `&country=PH` +
+    `&access_token=${MAPBOX_TOKEN}`;
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -24,7 +48,7 @@ export async function geocodePlace(query) {
   const [lng, lat] = firstResult.geometry.coordinates;
 
   return {
-    name: firstResult.properties?.full_address || firstResult.properties?.name || query,
+    name: formatSuggestionName(firstResult),
     lng,
     lat,
   };
@@ -37,7 +61,13 @@ export async function getPlaceSuggestions(query) {
 
   const encodedQuery = encodeURIComponent(query.trim());
 
-  const url = `https://api.mapbox.com/search/geocode/v6/forward?q=${encodedQuery}&autocomplete=true&limit=5&access_token=${MAPBOX_TOKEN}`;
+  const url =
+    `https://api.mapbox.com/search/geocode/v6/forward` +
+    `?q=${encodedQuery}` +
+    `&autocomplete=true` +
+    `&limit=5` +
+    `&country=PH` +
+    `&access_token=${MAPBOX_TOKEN}`;
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -51,7 +81,7 @@ export async function getPlaceSuggestions(query) {
 
     return {
       id: place.id,
-      name: place.properties?.full_address || place.properties?.name || "Unknown place",
+      name: formatSuggestionName(place),
       lng,
       lat,
     };

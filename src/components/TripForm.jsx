@@ -191,7 +191,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
               value={tripData.origin}
               onChange={handleChange}
               onFocus={() => setActiveField("origin")}
-              placeholder="e.g. Quezon City"
+              placeholder="e.g. Ilagan, Isabela"
               className={getInputClass("origin", "pr-12")}
               autoComplete="off"
             />
@@ -257,7 +257,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
               value={tripData.destination}
               onChange={handleChange}
               onFocus={() => setActiveField("destination")}
-              placeholder="e.g. Tagaytay"
+              placeholder="e.g. Tuguegarao City, Cagayan"
               className={getInputClass("destination", "pr-12")}
               autoComplete="off"
             />

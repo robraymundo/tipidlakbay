@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getPlaceSuggestions } from "../services/mapbox";
 
 const vehicleOptions = [
@@ -13,6 +13,9 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
   const [suggestions, setSuggestions] = useState([]);
   const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const originRef = useRef(null);
+  const destinationRef = useRef(null);
 
   const validateForm = () => {
     const newErrors = {};
@@ -146,7 +149,31 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
     return () => clearTimeout(timeoutId);
   }, [tripData.origin, tripData.destination, activeField]);
 
-  const baseInputClass = `w-full rounded-xl border px-4 py-3 outline-none transition`;
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const clickedOutsideOrigin =
+        originRef.current && !originRef.current.contains(event.target);
+
+      const clickedOutsideDestination =
+        destinationRef.current &&
+        !destinationRef.current.contains(event.target);
+
+      if (clickedOutsideOrigin && clickedOutsideDestination) {
+        setSuggestions([]);
+        setActiveField(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const baseInputClass =
+    "w-full rounded-xl border px-4 py-3 outline-none transition";
+
   const defaultInputClass = darkMode
     ? "border-slate-700 bg-slate-800 text-white placeholder:text-slate-400 focus:border-slate-500"
     : "border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-slate-500";
@@ -181,8 +208,10 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
       <h2 className="mb-4 text-xl font-semibold">Trip Details</h2>
 
       <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
-        <div className="relative md:col-span-2">
-          <label className="mb-1 block text-sm font-medium">Starting Point</label>
+        <div ref={originRef} className="relative md:col-span-2">
+          <label className="mb-1 block text-sm font-medium">
+            Starting Point
+          </label>
 
           <div className="relative">
             <input
@@ -247,7 +276,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
             )}
         </div>
 
-        <div className="relative md:col-span-2">
+        <div ref={destinationRef} className="relative md:col-span-2">
           <label className="mb-1 block text-sm font-medium">Destination</label>
 
           <div className="relative">
@@ -375,7 +404,7 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full rounded-xl px-4 py-3 my-5 font-semibold transition ${
+            className={`my-5 w-full rounded-xl px-4 py-3 font-semibold transition ${
               darkMode
                 ? "bg-white text-slate-900 hover:bg-slate-200 disabled:bg-slate-300"
                 : "bg-slate-900 text-white hover:bg-slate-700 disabled:bg-slate-400"

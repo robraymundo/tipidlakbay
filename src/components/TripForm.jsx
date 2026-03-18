@@ -84,8 +84,11 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
       ...prev,
       [fieldName]: "",
     }));
-    setSuggestions([]);
-    setActiveField(fieldName);
+
+    if (fieldName === "origin" || fieldName === "destination") {
+      setSuggestions([]);
+      setActiveField(fieldName);
+    }
 
     if (errors[fieldName]) {
       setErrors((prev) => ({
@@ -366,16 +369,47 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
           <label className="mb-1 block text-sm font-medium">
             Fuel Efficiency (km/L)
           </label>
-          <input
-            type="number"
-            name="fuelEfficiency"
-            value={tripData.fuelEfficiency}
-            onChange={handleChange}
-            placeholder="e.g. 14"
-            min="1"
-            step="1"
-            className={getInputClass("fuelEfficiency")}
-          />
+
+          <div className="relative">
+            <input
+              type="number"
+              name="fuelEfficiency"
+              value={tripData.fuelEfficiency}
+              onChange={handleChange}
+              placeholder="e.g. 14"
+              min="1"
+              step="0.1"
+              className={getInputClass("fuelEfficiency", "pr-12")}
+            />
+
+            {tripData.fuelEfficiency && (
+              <button
+                type="button"
+                onClick={() => clearField("fuelEfficiency")}
+                className={`absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition ${
+                  darkMode
+                    ? "text-slate-200 hover:bg-slate-700 hover:text-white"
+                    : "text-slate-500 hover:bg-slate-200 hover:text-slate-900"
+                }`}
+                aria-label="Clear fuel efficiency"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-4 w-4"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+
           {errors.fuelEfficiency && (
             <p className={errorTextClass}>{errors.fuelEfficiency}</p>
           )}
@@ -385,16 +419,47 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
           <label className="mb-1 block text-sm font-medium">
             Fuel Price (₱ / L)
           </label>
-          <input
-            type="number"
-            name="fuelPrice"
-            value={tripData.fuelPrice}
-            onChange={handleChange}
-            placeholder="e.g. 65"
-            min="0"
-            step="1"
-            className={getInputClass("fuelPrice")}
-          />
+
+          <div className="relative">
+            <input
+              type="number"
+              name="fuelPrice"
+              value={tripData.fuelPrice}
+              onChange={handleChange}
+              placeholder="e.g. 65"
+              min="0"
+              step="0.01"
+              className={getInputClass("fuelPrice", "pr-12")}
+            />
+
+            {tripData.fuelPrice && (
+              <button
+                type="button"
+                onClick={() => clearField("fuelPrice")}
+                className={`absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition ${
+                  darkMode
+                    ? "text-slate-200 hover:bg-slate-700 hover:text-white"
+                    : "text-slate-500 hover:bg-slate-200 hover:text-slate-900"
+                }`}
+                aria-label="Clear fuel price"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-4 w-4"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+
           {errors.fuelPrice && (
             <p className={errorTextClass}>{errors.fuelPrice}</p>
           )}

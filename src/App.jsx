@@ -90,8 +90,7 @@ function App() {
                 darkMode ? "text-slate-300" : "text-slate-600"
               }`}
             >
-              Plan your trip cost based on distance, fuel usage, route options,
-              and additional travel expenses.
+              Smart trip budgeting in the midst of rising fuel prices.
             </p>
           </div>
 

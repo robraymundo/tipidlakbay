@@ -1,16 +1,36 @@
-# React + Vite
+## TipidLakbay
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+TipidLakbay is a smart trip cost optimizer that helps users estimate travel expenses based on origin, destination, vehicle type, fuel efficiency, and fuel price. It is designed to make trip planning more practical, accessible, and budget-friendly.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Distance & Fuel Estimation**  
+  Calculates travel distance, fuel consumption, and estimated fuel cost based on user inputs.
 
-## React Compiler
+- **Smart Route Comparison**  
+  Compares multiple routes to identify the fastest, cheapest, or most fuel-efficient option.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **AI Vehicle Efficiency Lookup**  
+  Allows users to input their specific car model, automatically retrieving estimated fuel efficiency using AI to improve accuracy and reduce manual input.
 
-## Expanding the ESLint configuration
+- **Smart Fuel Price Input**  
+  Allows users to input current fuel prices with suggested averages, ensuring accurate and reliable trip cost estimation without relying on external APIs.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## How It Works
+
+1. Enter your starting point and destination
+2. Select your vehicle type
+3. Input or adjust fuel efficiency
+4. Input the current fuel price
+5. Click calculate to estimate the trip cost
+
+## Tech Stack
+
+- React
+- Vite
+- Tailwind CSS
+- Mapbox API
+
+## Purpose
+
+This project was built to help users make better travel decisions by providing a quick estimate of transportation costs before starting a trip.

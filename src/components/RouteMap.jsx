@@ -72,7 +72,13 @@ function ensureRouteLayers(map) {
   }
 }
 
-function RouteMap({ routes = [], originCoords, destinationCoords, darkMode }) {
+function RouteMap({
+  routes = [],
+  originCoords,
+  destinationCoords,
+  selectedRouteId,
+  darkMode,
+}) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const originMarkerRef = useRef(null);
@@ -81,10 +87,12 @@ function RouteMap({ routes = [], originCoords, destinationCoords, darkMode }) {
   const routesRef = useRef(routes);
   const originRef = useRef(originCoords);
   const destinationRef = useRef(destinationCoords);
+  const selectedRouteIdRef = useRef(selectedRouteId);
 
   routesRef.current = routes;
   originRef.current = originCoords;
   destinationRef.current = destinationCoords;
+  selectedRouteIdRef.current = selectedRouteId;
 
   const renderMapData = () => {
     const map = mapRef.current;
@@ -92,12 +100,15 @@ function RouteMap({ routes = [], originCoords, destinationCoords, darkMode }) {
 
     ensureRouteLayers(map);
 
-    const features = routesRef.current.map((route, index) => ({
+    const activeRouteId =
+      selectedRouteIdRef.current ?? routesRef.current[0]?.id ?? null;
+
+    const features = routesRef.current.map((route) => ({
       type: "Feature",
       properties: {
         id: route.id,
         name: route.name,
-        isSelected: index === 0,
+        isSelected: route.id === activeRouteId,
       },
       geometry: route.geometry,
     }));
@@ -193,7 +204,7 @@ function RouteMap({ routes = [], originCoords, destinationCoords, darkMode }) {
 
     if (!map.isStyleLoaded()) return;
     renderMapData();
-  }, [routes, originCoords, destinationCoords]);
+  }, [routes, originCoords, destinationCoords, selectedRouteId]);
 
   return (
     <div className="relative h-[320px] overflow-hidden rounded-2xl">

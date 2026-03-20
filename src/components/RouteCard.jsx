@@ -8,18 +8,27 @@ function formatPeso(value) {
 
 function RouteCard({
   route,
+  isSelected,
   isCheapest,
   isFastest,
   isMostEfficient,
   darkMode,
+  onSelect,
 }) {
   return (
-    <div
-      className={`rounded-2xl border p-4 ${
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`w-full rounded-2xl border p-4 text-left transition ${
         darkMode
-          ? "border-slate-700 bg-slate-900"
-          : "border-slate-200 bg-white"
+          ? isSelected
+            ? "border-blue-500 bg-slate-900 ring-2 ring-blue-500/30"
+            : "border-slate-700 bg-slate-900 hover:border-slate-500"
+          : isSelected
+          ? "border-blue-500 bg-white ring-2 ring-blue-500/20"
+          : "border-slate-200 bg-white hover:border-slate-300"
       }`}
+      aria-pressed={isSelected}
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
@@ -49,31 +58,55 @@ function RouteCard({
       </div>
 
       <div className="grid gap-3 text-sm md:grid-cols-2">
-        <div className={`rounded-xl p-3 ${darkMode ? "bg-slate-800" : "bg-slate-50"}`}>
-          <p className={darkMode ? "text-slate-400" : "text-slate-500"}>Distance</p>
+        <div
+          className={`rounded-xl p-3 ${
+            darkMode ? "bg-slate-800" : "bg-slate-50"
+          }`}
+        >
+          <p className={darkMode ? "text-slate-400" : "text-slate-500"}>
+            Distance
+          </p>
           <p className="mt-1 font-semibold">{route.distance.toFixed(1)} km</p>
         </div>
 
-        <div className={`rounded-xl p-3 ${darkMode ? "bg-slate-800" : "bg-slate-50"}`}>
-          <p className={darkMode ? "text-slate-400" : "text-slate-500"}>Estimated Time</p>
+        <div
+          className={`rounded-xl p-3 ${
+            darkMode ? "bg-slate-800" : "bg-slate-50"
+          }`}
+        >
+          <p className={darkMode ? "text-slate-400" : "text-slate-500"}>
+            Estimated Time
+          </p>
           <p className="mt-1 font-semibold">{route.duration} mins</p>
         </div>
 
-        <div className={`rounded-xl p-3 ${darkMode ? "bg-slate-800" : "bg-slate-50"}`}>
-          <p className={darkMode ? "text-slate-400" : "text-slate-500"}>Fuel Needed</p>
+        <div
+          className={`rounded-xl p-3 ${
+            darkMode ? "bg-slate-800" : "bg-slate-50"
+          }`}
+        >
+          <p className={darkMode ? "text-slate-400" : "text-slate-500"}>
+            Fuel Needed
+          </p>
           <p className="mt-1 font-semibold">
             {route.result ? `${route.result.litersNeeded.toFixed(2)} L` : "--"}
           </p>
         </div>
 
-        <div className={`rounded-xl p-3 ${darkMode ? "bg-slate-800" : "bg-slate-50"}`}>
-          <p className={darkMode ? "text-slate-400" : "text-slate-500"}>Estimated Total Cost</p>
+        <div
+          className={`rounded-xl p-3 ${
+            darkMode ? "bg-slate-800" : "bg-slate-50"
+          }`}
+        >
+          <p className={darkMode ? "text-slate-400" : "text-slate-500"}>
+            Estimated Total Cost
+          </p>
           <p className="mt-1 font-semibold">
             {route.result ? formatPeso(route.result.totalCost) : "--"}
           </p>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 

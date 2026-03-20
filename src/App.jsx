@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TripForm from "./components/TripForm";
 import RouteCard from "./components/RouteCard";
 import CostSummary from "./components/CostSummary";
@@ -13,6 +13,7 @@ function App() {
   const [routeError, setRouteError] = useState("");
   const [liveRoutes, setLiveRoutes] = useState([]);
   const [appliedTripData, setAppliedTripData] = useState(null);
+  const [selectedRouteId, setSelectedRouteId] = useState(null);
   const [mapLocations, setMapLocations] = useState({
     origin: null,
     destination: null,
@@ -35,6 +36,7 @@ function App() {
       setRouteError("");
       setHasCalculated(false);
       setLiveRoutes([]);
+      setSelectedRouteId(null);
       setMapLocations({ origin: null, destination: null });
 
       const submittedTripData = { ...tripData };
@@ -120,6 +122,21 @@ function App() {
     ).id;
   }, [computedRoutes]);
 
+  useEffect(() => {
+    if (!hasCalculated || !computedRoutes.length) {
+      setSelectedRouteId(null);
+      return;
+    }
+
+    const selectedStillExists = computedRoutes.some(
+      (route) => route.id === selectedRouteId
+    );
+
+    if (!selectedStillExists) {
+      setSelectedRouteId(cheapestRouteId ?? computedRoutes[0].id);
+    }
+  }, [hasCalculated, computedRoutes, cheapestRouteId, selectedRouteId]);
+
   const selectedSummary = useMemo(() => {
     if (!hasCalculated) return null;
     const route = computedRoutes.find((item) => item.id === cheapestRouteId);
@@ -161,7 +178,9 @@ function App() {
           <div className="space-y-6">
             <section
               className={`rounded-2xl p-5 shadow-sm ring-1 ${
-                darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
+                darkMode
+                  ? "bg-slate-900 ring-slate-800"
+                  : "bg-white ring-slate-200"
               }`}
             >
               <h2 className="mb-4 text-xl font-semibold">Route Map</h2>
@@ -170,6 +189,7 @@ function App() {
                 routes={hasCalculated ? liveRoutes : []}
                 originCoords={mapLocations.origin}
                 destinationCoords={mapLocations.destination}
+                selectedRouteId={selectedRouteId}
                 darkMode={darkMode}
               />
             </section>
@@ -186,7 +206,9 @@ function App() {
           <div className="space-y-6">
             <div
               className={`rounded-2xl p-5 shadow-sm ring-1 ${
-                darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
+                darkMode
+                  ? "bg-slate-900 ring-slate-800"
+                  : "bg-white ring-slate-200"
               }`}
             >
               <h2 className="mb-4 text-xl font-semibold">Route Comparison</h2>
@@ -228,10 +250,12 @@ function App() {
                     <RouteCard
                       key={route.id}
                       route={route}
+                      isSelected={route.id === selectedRouteId}
                       isCheapest={route.id === cheapestRouteId}
                       isFastest={route.id === fastestRouteId}
                       isMostEfficient={route.id === mostEfficientRouteId}
                       darkMode={darkMode}
+                      onSelect={() => setSelectedRouteId(route.id)}
                     />
                   ))}
                 </div>
@@ -243,7 +267,8 @@ function App() {
               selectedSummary={selectedSummary}
               cheapestRoute={
                 hasCalculated
-                  ? computedRoutes.find((route) => route.id === cheapestRouteId) || null
+                  ? computedRoutes.find((route) => route.id === cheapestRouteId) ||
+                    null
                   : null
               }
               darkMode={darkMode}

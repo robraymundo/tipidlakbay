@@ -43,8 +43,16 @@ function CostSummary({
       <h2 className="mb-4 text-xl font-semibold">Trip Summary</h2>
 
       <div className="space-y-4">
-        <div className={`rounded-xl p-4 ${darkMode ? "bg-slate-800" : "bg-slate-50"}`}>
-          <p className={darkMode ? "text-slate-400 text-sm" : "text-slate-500 text-sm"}>
+        <div
+          className={`rounded-xl p-4 ${
+            darkMode ? "bg-slate-800" : "bg-slate-50"
+          }`}
+        >
+          <p
+            className={
+              darkMode ? "text-sm text-slate-400" : "text-sm text-slate-500"
+            }
+          >
             Recommended Route
           </p>
           <p className="mt-1 text-lg font-semibold">
@@ -52,18 +60,40 @@ function CostSummary({
           </p>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2">
-          <div className={`rounded-xl border p-4 ${darkMode ? "border-slate-700" : "border-slate-200"}`}>
-            <p className={darkMode ? "text-slate-400 text-sm" : "text-slate-500 text-sm"}>
-              Total Distance
+        <div className="grid gap-3 md:grid-cols-3">
+          <div
+            className={`rounded-xl border p-4 ${
+              darkMode
+                ? "border-emerald-800 bg-emerald-950/40"
+                : "border-emerald-200 bg-emerald-50"
+            }`}
+          >
+            <p
+              className={
+                darkMode
+                  ? "text-sm text-emerald-300"
+                  : "text-sm text-emerald-700"
+              }
+            >
+              Total Cost
             </p>
             <p className="mt-1 text-lg font-semibold">
-              {selectedSummary?.totalDistance?.toFixed(1)} km
+              {formatPeso(selectedSummary?.totalCost || 0)}
             </p>
           </div>
 
-          <div className={`rounded-xl border p-4 ${darkMode ? "border-slate-700" : "border-slate-200"}`}>
-            <p className={darkMode ? "text-slate-400 text-sm" : "text-slate-500 text-sm"}>
+          <div
+            className={`rounded-xl border p-4 ${
+              darkMode
+                ? "border-amber-800 bg-amber-950/40"
+                : "border-amber-200 bg-amber-50"
+            }`}
+          >
+            <p
+              className={
+                darkMode ? "text-sm text-amber-300" : "text-sm text-amber-700"
+              }
+            >
               Fuel Needed
             </p>
             <p className="mt-1 text-lg font-semibold">
@@ -71,27 +101,35 @@ function CostSummary({
             </p>
           </div>
 
-          <div className={`rounded-xl border p-4 ${darkMode ? "border-slate-700" : "border-slate-200"}`}>
-            <p className={darkMode ? "text-slate-400 text-sm" : "text-slate-500 text-sm"}>
-              Fuel Cost
+          <div
+            className={`rounded-xl border p-4 ${
+              darkMode
+                ? "border-blue-800 bg-blue-950/40"
+                : "border-blue-200 bg-blue-50"
+            }`}
+          >
+            <p
+              className={
+                darkMode ? "text-sm text-blue-300" : "text-sm text-blue-700"
+              }
+            >
+              Total Distance
             </p>
             <p className="mt-1 text-lg font-semibold">
-              {formatPeso(selectedSummary?.fuelCost || 0)}
-            </p>
-          </div>
-
-          <div className={`rounded-xl border p-4 ${darkMode ? "border-slate-700" : "border-slate-200"}`}>
-            <p className={darkMode ? "text-slate-400 text-sm" : "text-slate-500 text-sm"}>
-              Estimated Total Cost
-            </p>
-            <p className="mt-1 text-lg font-semibold">
-              {formatPeso(selectedSummary?.totalCost || 0)}
+              {selectedSummary?.totalDistance?.toFixed(1)} km
             </p>
           </div>
         </div>
 
-        <div className="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">
-           This estimate is based on route distance, fuel price, and vehicle fuel efficiency.
+        <div
+          className={`rounded-xl p-4 text-sm ${
+            darkMode
+              ? "bg-slate-950/40"
+              : "bg-slate-50"
+          }`}
+        >
+          This estimate is based on route distance, fuel price, and vehicle fuel
+          efficiency.
           {tripData.roundTrip ? " Round-trip mode is enabled." : ""}
         </div>
       </div>

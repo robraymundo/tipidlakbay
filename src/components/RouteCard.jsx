@@ -6,6 +6,23 @@ function formatPeso(value) {
   }).format(value);
 }
 
+function formatDuration(minutes) {
+  if (!Number.isFinite(minutes) || minutes < 0) return "--";
+
+  const hrs = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  if (hrs === 0) {
+    return `${mins} min${mins === 1 ? "" : "s"}`;
+  }
+
+  if (mins === 0) {
+    return `${hrs} hr${hrs === 1 ? "" : "s"}`;
+  }
+
+  return `${hrs} hr${hrs === 1 ? "" : "s"} ${mins} min${mins === 1 ? "" : "s"}`;
+}
+
 function RouteCard({
   route,
   isSelected,
@@ -77,7 +94,7 @@ function RouteCard({
           <p className={darkMode ? "text-slate-400" : "text-slate-500"}>
             Estimated Time
           </p>
-          <p className="mt-1 font-semibold">{route.duration} mins</p>
+          <p className="mt-1 font-semibold">{formatDuration(route.duration)}</p>
         </div>
 
         <div

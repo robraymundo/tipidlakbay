@@ -193,7 +193,7 @@ function App() {
                 darkMode={darkMode}
               />
             </section>
-
+            
             <TripForm
               tripData={tripData}
               setTripData={setTripData}

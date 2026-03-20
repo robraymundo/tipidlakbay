@@ -16,11 +16,11 @@ function CostSummary({
   if (!hasCalculated) {
     return (
       <section
-        className={`rounded-2xl p-5 shadow-sm ring-1 ${
+        className={`rounded-2xl p-4 shadow-sm ring-1 ${
           darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
         }`}
       >
-        <h2 className="mb-4 text-xl font-semibold">Trip Summary</h2>
+        <h2 className="mb-3 text-lg font-semibold">Trip Summary</h2>
         <div
           className={`rounded-xl p-4 text-sm ${
             darkMode
@@ -36,15 +36,15 @@ function CostSummary({
 
   return (
     <section
-      className={`rounded-2xl p-5 shadow-sm ring-1 ${
+      className={`rounded-2xl p-4 shadow-sm ring-1 ${
         darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
       }`}
     >
-      <h2 className="mb-4 text-xl font-semibold">Trip Summary</h2>
+      <h2 className="mb-3 text-lg font-semibold">Trip Summary</h2>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div
-          className={`rounded-xl p-4 ${
+          className={`rounded-xl p-3 ${
             darkMode ? "bg-slate-800" : "bg-slate-50"
           }`}
         >
@@ -55,14 +55,14 @@ function CostSummary({
           >
             Recommended Route
           </p>
-          <p className="mt-1 text-lg font-semibold">
+          <p className="mt-1 text-base font-semibold">
             {cheapestRoute?.name || "N/A"}
           </p>
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
           <div
-            className={`rounded-xl border p-4 ${
+            className={`rounded-xl border p-3 ${
               darkMode
                 ? "border-emerald-800 bg-emerald-950/40"
                 : "border-emerald-200 bg-emerald-50"
@@ -83,7 +83,7 @@ function CostSummary({
           </div>
 
           <div
-            className={`rounded-xl border p-4 ${
+            className={`rounded-xl border p-3 ${
               darkMode
                 ? "border-amber-800 bg-amber-950/40"
                 : "border-amber-200 bg-amber-50"
@@ -102,7 +102,7 @@ function CostSummary({
           </div>
 
           <div
-            className={`rounded-xl border p-4 ${
+            className={`rounded-xl border p-3 ${
               darkMode
                 ? "border-blue-800 bg-blue-950/40"
                 : "border-blue-200 bg-blue-50"
@@ -122,10 +122,8 @@ function CostSummary({
         </div>
 
         <div
-          className={`rounded-xl p-4 text-sm ${
-            darkMode
-              ? "bg-slate-950/40"
-              : "bg-slate-50"
+          className={`rounded-xl p-3 text-sm ${
+            darkMode ? "bg-slate-950/40" : "bg-slate-50"
           }`}
         >
           This estimate is based on route distance, fuel price, and vehicle fuel

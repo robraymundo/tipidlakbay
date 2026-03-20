@@ -144,17 +144,19 @@ function App() {
   }, [computedRoutes, cheapestRouteId, hasCalculated]);
 
   return (
-    <main
-      className={`min-h-screen w-full px-4 py-8 transition-colors duration-300 ${
-        darkMode ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-900"
-      }`}
-    >
-      <div className="mx-auto w-full max-w-7xl">
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <>
+      <header
+        className={`sticky top-0 z-50 border-b backdrop-blur ${
+          darkMode
+            ? "border-slate-800 bg-slate-950 text-white"
+            : "border-slate-200 bg-slate-100/85 text-slate-900"
+        }`}
+      >
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3">
           <div>
-            <h1 className="text-3xl font-bold md:text-4xl">TipidLakbay</h1>
+            <h1 className="text-2xl font-bold md:text-3xl">TipidLakbay</h1>
             <p
-              className={`mt-2 max-w-2xl ${
+              className={`mt-1 text-sm ${
                 darkMode ? "text-slate-300" : "text-slate-600"
               }`}
             >
@@ -164,7 +166,7 @@ function App() {
 
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className={`rounded-xl px-4 py-2 font-medium transition ${
+            className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
               darkMode
                 ? "bg-white text-slate-900 hover:bg-slate-200"
                 : "bg-slate-900 text-white hover:bg-slate-700"
@@ -173,111 +175,124 @@ function App() {
             {darkMode ? "Light Mode" : "Dark Mode"}
           </button>
         </div>
+      </header>
 
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <section
-            className={`rounded-2xl p-5 shadow-sm ring-1 ${
-              darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
-            }`}
-          >
-            <div className="space-y-6">
-              <div>
-                <RouteMap
-                  routes={hasCalculated ? liveRoutes : []}
-                  originCoords={mapLocations.origin}
-                  destinationCoords={mapLocations.destination}
-                  selectedRouteId={selectedRouteId}
-                  darkMode={darkMode}
-                />
-              </div>
-
-              <div>
-                <h2 className="mb-4 text-xl font-semibold">Trip Details</h2>
-                <TripForm
-                  tripData={tripData}
-                  setTripData={setTripData}
-                  darkMode={darkMode}
-                  onCalculate={handleCalculate}
-                  loading={loading}
-                  embedded
-                />
-              </div>
-            </div>
-          </section>
-
-          <div className="space-y-6">
-            <div
-              className={`rounded-2xl p-5 shadow-sm ring-1 ${
-                darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
+      <main
+        className={`min-h-screen w-full transition-colors duration-300 ${
+          darkMode ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-900"
+        }`}
+      >
+        <div className="mx-auto w-full max-w-6xl px-4 py-5 md:py-6">
+          <div className="grid gap-5 lg:grid-cols-[1.08fr_0.92fr]">
+            <section
+              className={`rounded-2xl p-4 shadow-sm ring-1 ${
+                darkMode
+                  ? "bg-slate-900 ring-slate-800"
+                  : "bg-white ring-slate-200"
               }`}
             >
-              <h2 className="mb-4 text-xl font-semibold">Route Comparison</h2>
+              <div className="space-y-5">
+                <div>
+                  <RouteMap
+                    routes={hasCalculated ? liveRoutes : []}
+                    originCoords={mapLocations.origin}
+                    destinationCoords={mapLocations.destination}
+                    selectedRouteId={selectedRouteId}
+                    darkMode={darkMode}
+                  />
+                </div>
 
-              {routeError ? (
-                <div
-                  className={`rounded-xl p-4 text-sm ${
-                    darkMode
-                      ? "bg-red-950 text-red-200"
-                      : "bg-red-50 text-red-700"
-                  }`}
-                >
-                  {routeError}
+                <div>
+                  <h2 className="mb-3 text-lg font-semibold">Trip Details</h2>
+                  <TripForm
+                    tripData={tripData}
+                    setTripData={setTripData}
+                    darkMode={darkMode}
+                    onCalculate={handleCalculate}
+                    loading={loading}
+                    embedded
+                  />
                 </div>
-              ) : loading ? (
-                <div
-                  className={`rounded-xl p-4 text-sm ${
-                    darkMode
-                      ? "bg-slate-800 text-slate-300"
-                      : "bg-slate-50 text-slate-600"
-                  }`}
-                >
-                  Calculating routes...
-                </div>
-              ) : !hasCalculated ? (
-                <div
-                  className={`rounded-xl p-4 text-sm ${
-                    darkMode
-                      ? "bg-slate-800 text-slate-300"
-                      : "bg-slate-50 text-slate-600"
-                  }`}
-                >
-                  Fill in the trip details and click{" "}
-                  <span className="font-semibold">Calculate Trip</span>.
-                </div>
-              ) : (
-                <div className="grid gap-4">
-                  {computedRoutes.map((route) => (
-                    <RouteCard
-                      key={route.id}
-                      route={route}
-                      isSelected={route.id === selectedRouteId}
-                      isCheapest={route.id === cheapestRouteId}
-                      isFastest={route.id === fastestRouteId}
-                      isMostEfficient={route.id === mostEfficientRouteId}
-                      darkMode={darkMode}
-                      onSelect={() => setSelectedRouteId(route.id)}
-                    />
-                  ))}
-                </div>
-              )}
+              </div>
+            </section>
+
+            <div className="space-y-5">
+              <div
+                className={`rounded-2xl p-4 shadow-sm ring-1 ${
+                  darkMode
+                    ? "bg-slate-900 ring-slate-800"
+                    : "bg-white ring-slate-200"
+                }`}
+              >
+                <h2 className="mb-3 text-lg font-semibold">Route Comparison</h2>
+
+                {routeError ? (
+                  <div
+                    className={`rounded-xl p-4 text-sm ${
+                      darkMode
+                        ? "bg-red-950 text-red-200"
+                        : "bg-red-50 text-red-700"
+                    }`}
+                  >
+                    {routeError}
+                  </div>
+                ) : loading ? (
+                  <div
+                    className={`rounded-xl p-4 text-sm ${
+                      darkMode
+                        ? "bg-slate-800 text-slate-300"
+                        : "bg-slate-50 text-slate-600"
+                    }`}
+                  >
+                    Calculating routes...
+                  </div>
+                ) : !hasCalculated ? (
+                  <div
+                    className={`rounded-xl p-4 text-sm ${
+                      darkMode
+                        ? "bg-slate-800 text-slate-300"
+                        : "bg-slate-50 text-slate-600"
+                    }`}
+                  >
+                    Fill in the trip details and click{" "}
+                    <span className="font-semibold">Calculate Trip</span>.
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {computedRoutes.map((route) => (
+                      <RouteCard
+                        key={route.id}
+                        route={route}
+                        isSelected={route.id === selectedRouteId}
+                        isCheapest={route.id === cheapestRouteId}
+                        isFastest={route.id === fastestRouteId}
+                        isMostEfficient={route.id === mostEfficientRouteId}
+                        darkMode={darkMode}
+                        onSelect={() => setSelectedRouteId(route.id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <CostSummary
+                tripData={appliedTripData || tripData}
+                selectedSummary={selectedSummary}
+                cheapestRoute={
+                  hasCalculated
+                    ? computedRoutes.find(
+                        (route) => route.id === cheapestRouteId
+                      ) || null
+                    : null
+                }
+                darkMode={darkMode}
+                hasCalculated={hasCalculated}
+              />
             </div>
-
-            <CostSummary
-              tripData={appliedTripData || tripData}
-              selectedSummary={selectedSummary}
-              cheapestRoute={
-                hasCalculated
-                  ? computedRoutes.find((route) => route.id === cheapestRouteId) ||
-                    null
-                  : null
-              }
-              darkMode={darkMode}
-              hasCalculated={hasCalculated}
-            />
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
 

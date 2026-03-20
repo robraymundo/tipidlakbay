@@ -136,7 +136,11 @@ function RouteMap({
         .addTo(map);
     }
 
-    if (!routesRef.current.length || !originRef.current || !destinationRef.current) {
+    if (
+      !routesRef.current.length ||
+      !originRef.current ||
+      !destinationRef.current
+    ) {
       return;
     }
 
@@ -150,7 +154,7 @@ function RouteMap({
     bounds.extend([destinationRef.current.lng, destinationRef.current.lat]);
 
     map.fitBounds(bounds, {
-      padding: 50,
+      padding: 40,
       duration: 800,
     });
   };
@@ -207,12 +211,12 @@ function RouteMap({
   }, [routes, originCoords, destinationCoords, selectedRouteId]);
 
   return (
-    <div className="relative h-[320px] overflow-hidden rounded-2xl">
+    <div className="relative h-[250px] overflow-hidden rounded-2xl md:h-[280px]">
       <div ref={mapContainerRef} className="h-full w-full" />
 
       {!routes.length && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-900/20 backdrop-blur-[1px]">
-          <div className="rounded-xl bg-white/90 px-4 py-3 text-sm font-medium text-slate-700 shadow">
+          <div className="rounded-xl bg-white/90 px-4 py-3 text-center text-sm font-medium text-slate-700 shadow">
             Enter your starting point and destination, then calculate your trip.
           </div>
         </div>

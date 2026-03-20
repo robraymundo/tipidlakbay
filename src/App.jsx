@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import TripForm from "./components/TripForm";
 import RouteCard from "./components/RouteCard";
 import CostSummary from "./components/CostSummary";
+import RouteMap from "./components/RouteMap";
 import { calculateTripCost } from "./utils/calculateTrip";
 import { geocodePlace, getRoutes } from "./services/mapbox";
 
@@ -12,6 +13,10 @@ function App() {
   const [routeError, setRouteError] = useState("");
   const [liveRoutes, setLiveRoutes] = useState([]);
   const [appliedTripData, setAppliedTripData] = useState(null);
+  const [mapLocations, setMapLocations] = useState({
+    origin: null,
+    destination: null,
+  });
 
   const [tripData, setTripData] = useState({
     origin: "",
@@ -29,6 +34,8 @@ function App() {
       setLoading(true);
       setRouteError("");
       setHasCalculated(false);
+      setLiveRoutes([]);
+      setMapLocations({ origin: null, destination: null });
 
       const submittedTripData = { ...tripData };
 
@@ -48,6 +55,10 @@ function App() {
       }));
 
       setLiveRoutes(labeledRoutes);
+      setMapLocations({
+        origin: originCoords,
+        destination: destinationCoords,
+      });
       setAppliedTripData(submittedTripData);
       setHasCalculated(true);
     } catch (error) {
@@ -147,20 +158,35 @@ function App() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <TripForm
-            tripData={tripData}
-            setTripData={setTripData}
-            darkMode={darkMode}
-            onCalculate={handleCalculate}
-            loading={loading}
-          />
+          <div className="space-y-6">
+            <section
+              className={`rounded-2xl p-5 shadow-sm ring-1 ${
+                darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
+              }`}
+            >
+              <h2 className="mb-4 text-xl font-semibold">Route Map</h2>
+
+              <RouteMap
+                routes={hasCalculated ? liveRoutes : []}
+                originCoords={mapLocations.origin}
+                destinationCoords={mapLocations.destination}
+                darkMode={darkMode}
+              />
+            </section>
+
+            <TripForm
+              tripData={tripData}
+              setTripData={setTripData}
+              darkMode={darkMode}
+              onCalculate={handleCalculate}
+              loading={loading}
+            />
+          </div>
 
           <div className="space-y-6">
             <div
               className={`rounded-2xl p-5 shadow-sm ring-1 ${
-                darkMode
-                  ? "bg-slate-900 ring-slate-800"
-                  : "bg-white ring-slate-200"
+                darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
               }`}
             >
               <h2 className="mb-4 text-xl font-semibold">Route Comparison</h2>
@@ -217,8 +243,7 @@ function App() {
               selectedSummary={selectedSummary}
               cheapestRoute={
                 hasCalculated
-                  ? computedRoutes.find((route) => route.id === cheapestRouteId) ||
-                    null
+                  ? computedRoutes.find((route) => route.id === cheapestRouteId) || null
                   : null
               }
               darkMode={darkMode}

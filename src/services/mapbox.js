@@ -96,7 +96,7 @@ export async function getRoutes(originCoords, destinationCoords) {
 
   const url =
     `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}` +
-    `?alternatives=true&geometries=geojson&overview=simplified&steps=false&access_token=${MAPBOX_TOKEN}`;
+    `?alternatives=true&geometries=geojson&overview=full&steps=false&access_token=${MAPBOX_TOKEN}`;
 
   const response = await fetch(url);
   if (!response.ok) {

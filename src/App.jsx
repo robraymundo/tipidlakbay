@@ -175,40 +175,40 @@ function App() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="space-y-6">
-            <section
-              className={`rounded-2xl p-5 shadow-sm ring-1 ${
-                darkMode
-                  ? "bg-slate-900 ring-slate-800"
-                  : "bg-white ring-slate-200"
-              }`}
-            >
-              <h2 className="mb-4 text-xl font-semibold">Route Map</h2>
+          <section
+            className={`rounded-2xl p-5 shadow-sm ring-1 ${
+              darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
+            }`}
+          >
+            <div className="space-y-6">
+              <div>
+                <RouteMap
+                  routes={hasCalculated ? liveRoutes : []}
+                  originCoords={mapLocations.origin}
+                  destinationCoords={mapLocations.destination}
+                  selectedRouteId={selectedRouteId}
+                  darkMode={darkMode}
+                />
+              </div>
 
-              <RouteMap
-                routes={hasCalculated ? liveRoutes : []}
-                originCoords={mapLocations.origin}
-                destinationCoords={mapLocations.destination}
-                selectedRouteId={selectedRouteId}
-                darkMode={darkMode}
-              />
-            </section>
-            
-            <TripForm
-              tripData={tripData}
-              setTripData={setTripData}
-              darkMode={darkMode}
-              onCalculate={handleCalculate}
-              loading={loading}
-            />
-          </div>
+              <div>
+                <h2 className="mb-4 text-xl font-semibold">Trip Details</h2>
+                <TripForm
+                  tripData={tripData}
+                  setTripData={setTripData}
+                  darkMode={darkMode}
+                  onCalculate={handleCalculate}
+                  loading={loading}
+                  embedded
+                />
+              </div>
+            </div>
+          </section>
 
           <div className="space-y-6">
             <div
               className={`rounded-2xl p-5 shadow-sm ring-1 ${
-                darkMode
-                  ? "bg-slate-900 ring-slate-800"
-                  : "bg-white ring-slate-200"
+                darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
               }`}
             >
               <h2 className="mb-4 text-xl font-semibold">Route Comparison</h2>

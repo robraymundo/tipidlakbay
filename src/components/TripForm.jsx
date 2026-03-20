@@ -8,7 +8,14 @@ const vehicleOptions = [
   { label: "Truck", value: "truck", defaultEfficiency: 8 },
 ];
 
-function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
+function TripForm({
+  tripData,
+  setTripData,
+  darkMode,
+  onCalculate,
+  loading,
+  embedded = false,
+}) {
   const [activeField, setActiveField] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
@@ -202,13 +209,9 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
 
   const errorTextClass = "mt-1 text-sm text-red-500";
 
-  return (
-    <section
-      className={`rounded-2xl p-5 shadow-sm ring-1 ${
-        darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
-      }`}
-    >
-      <h2 className="mb-4 text-xl font-semibold">Trip Details</h2>
+  const formContent = (
+    <>
+      {!embedded && <h2 className="mb-4 text-xl font-semibold">Trip Details</h2>}
 
       <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
         <div ref={originRef} className="relative md:col-span-2">
@@ -479,6 +482,20 @@ function TripForm({ tripData, setTripData, darkMode, onCalculate, loading }) {
           </button>
         </div>
       </form>
+    </>
+  );
+
+  if (embedded) {
+    return formContent;
+  }
+
+  return (
+    <section
+      className={`rounded-2xl p-5 shadow-sm ring-1 ${
+        darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
+      }`}
+    >
+      {formContent}
     </section>
   );
 }

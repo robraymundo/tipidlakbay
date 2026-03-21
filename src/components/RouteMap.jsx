@@ -237,26 +237,29 @@ function RouteMap({
         )}
       </div>
       <p className="text-sm font-semibold">Gas Prices</p>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs md:text-sm">
-          <span>
-            RON 91:{" "}
-            <span className="font-semibold">
-              {formatFuelPrice(fuelPriceContext.prices.ron91)}
-            </span>
+
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs md:text-sm">
+        <span className="flex items-center gap-1">
+          <span className="font-medium">RON 91</span>
+          <span className="rounded-md bg-emerald-950/40 px-1.5 py-0.5 font-semibold text-emerald-200 ring-1 ring-emerald-800/60">
+            {formatFuelPrice(fuelPriceContext.prices.ron91)}
           </span>
-          <span>
-            RON 95:{" "}
-            <span className="font-semibold">
-              {formatFuelPrice(fuelPriceContext.prices.premium)}
-            </span>
+        </span>
+
+        <span className="flex items-center gap-1">
+          <span className="font-medium">RON 95</span>
+          <span className="rounded-md bg-emerald-950/40 px-1.5 py-0.5 font-semibold text-emerald-200 ring-1 ring-emerald-800/60">
+            {formatFuelPrice(fuelPriceContext.prices.premium)}
           </span>
-          <span>
-            DSL:{" "}
-            <span className="font-semibold">
-              {formatFuelPrice(fuelPriceContext.prices.diesel)}
-            </span>
+        </span>
+
+        <span className="flex items-center gap-1">
+          <span className="font-medium">DSL</span>
+          <span className="rounded-md bg-emerald-950/40 px-1.5 py-0.5 font-semibold text-emerald-200 ring-1 ring-emerald-800/60">
+            {formatFuelPrice(fuelPriceContext.prices.diesel)}
           </span>
-        </div>
+        </span>
+      </div>
 
         {fuelPriceContext.note && (
           <p className={`mt-1 text-[11px] md:text-xs ${noteClass}`}>

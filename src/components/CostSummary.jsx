@@ -41,19 +41,7 @@ function CostSummary({
         darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
       }`}
     >
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold">Trip Summary</h2>
-
-        {loading && (
-          <span
-            className={`text-xs ${
-              darkMode ? "text-slate-400" : "text-slate-500"
-            }`}
-          >
-            Updating summary...
-          </span>
-        )}
-      </div>
+      <h2 className="mb-3 text-lg font-semibold">Trip Summary</h2>
 
       <div className="space-y-3">
         <div

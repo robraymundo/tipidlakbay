@@ -296,16 +296,6 @@ function App() {
                   >
                     {routeError}
                   </div>
-                ) : loading && !hasCalculated ? (
-                  <div
-                    className={`rounded-lg p-3.5 text-sm ${
-                      darkMode
-                        ? "bg-slate-800 text-slate-300"
-                        : "bg-slate-50 text-slate-600"
-                    }`}
-                  >
-                    Calculating routes...
-                  </div>
                 ) : !hasCalculated ? (
                   <div
                     className={`rounded-lg p-3.5 text-sm ${
@@ -333,20 +323,7 @@ function App() {
                     ))}
                   </div>
                 )}
-
-                {loading && hasCalculated && (
-                  <div
-                    className={`mt-3 rounded-lg px-3 py-2 text-xs ${
-                      darkMode
-                        ? "bg-slate-800 text-slate-300"
-                        : "bg-slate-50 text-slate-600"
-                    }`}
-                  >
-                    Updating routes...
-                  </div>
-                )}
               </div>
-
               <div className="transition-all duration-300">
                 <CostSummary
                   tripData={appliedTripData || tripData}

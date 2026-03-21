@@ -456,13 +456,18 @@ function TripForm({
           <button
             type="submit"
             disabled={loading}
-            className={`mt-2 w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+            className={`mt-2 flex h-11 w-full items-center justify-center rounded-lg px-4 text-sm font-semibold transition-colors ${
               darkMode
                 ? "bg-white text-slate-900 hover:bg-slate-200 disabled:bg-slate-300"
                 : "bg-slate-900 text-white hover:bg-slate-700 disabled:bg-slate-400"
             }`}
           >
-            {loading ? "Calculating..." : "Calculate Trip"}
+            <span className="inline-flex min-w-[120px] items-center justify-center gap-2">
+              {loading && (
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              )}
+              {loading ? "Calculating..." : "Calculate Trip"}
+            </span>
           </button>
         </div>
       </form>

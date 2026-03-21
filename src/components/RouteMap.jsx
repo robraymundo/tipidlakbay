@@ -217,14 +217,22 @@ function RouteMap({
     renderMapData();
   }, [routes, originCoords, destinationCoords, selectedRouteId]);
 
-  const gasRowClass = darkMode
-    ? "border-slate-700 bg-slate-800/80 text-slate-200"
-    : "border-slate-200 bg-slate-50 text-slate-700";
+  const gasPanelClass = darkMode
+    ? "rounded-xl p-3"
+    : "rounded-xl bg-slate-50 p-3";
+
+  const gasTitleClass = darkMode ? "text-white" : "text-slate-900";
+
+  const gasLabelClass = darkMode ? "text-slate-200" : "text-slate-700";
+
+  const gasItemClass = darkMode
+    ? "rounded-md bg-emerald-950/40 px-1.5 py-0.5 font-semibold text-emerald-200 ring-1 ring-emerald-800/60"
+    : "rounded-md bg-emerald-100 px-1.5 py-0.5 font-semibold text-emerald-700 ring-1 ring-emerald-200";
 
   const noteClass = darkMode ? "text-slate-400" : "text-slate-500";
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-3">
       <div className="relative h-[220px] overflow-hidden rounded-xl md:h-[240px]">
         <div ref={mapContainerRef} className="h-full w-full" />
 
@@ -236,37 +244,42 @@ function RouteMap({
           </div>
         )}
       </div>
-      <p className="text-sm font-semibold">Gas Prices</p>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs md:text-sm">
-        <span className="flex items-center gap-1">
-          <span className="font-medium">RON 91</span>
-          <span className="rounded-md bg-emerald-950/40 px-1.5 py-0.5 font-semibold text-emerald-200 ring-1 ring-emerald-800/60">
-            {formatFuelPrice(fuelPriceContext.prices.ron91)}
-          </span>
-        </span>
+      <div className={gasPanelClass}>
+        <p className={`mb-2 text-sm font-semibold ${gasTitleClass}`}>
+          Gas Prices
+        </p>
 
-        <span className="flex items-center gap-1">
-          <span className="font-medium">RON 95</span>
-          <span className="rounded-md bg-emerald-950/40 px-1.5 py-0.5 font-semibold text-emerald-200 ring-1 ring-emerald-800/60">
-            {formatFuelPrice(fuelPriceContext.prices.premium)}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs md:text-sm">
+          <span className={`flex items-center gap-1 ${gasLabelClass}`}>
+            <span className="font-medium">RON 91</span>
+            <span className={gasItemClass}>
+              {formatFuelPrice(fuelPriceContext.prices.ron91)}
+            </span>
           </span>
-        </span>
 
-        <span className="flex items-center gap-1">
-          <span className="font-medium">DSL</span>
-          <span className="rounded-md bg-emerald-950/40 px-1.5 py-0.5 font-semibold text-emerald-200 ring-1 ring-emerald-800/60">
-            {formatFuelPrice(fuelPriceContext.prices.diesel)}
+          <span className={`flex items-center gap-1 ${gasLabelClass}`}>
+            <span className="font-medium">RON 95</span>
+            <span className={gasItemClass}>
+              {formatFuelPrice(fuelPriceContext.prices.premium)}
+            </span>
           </span>
-        </span>
-      </div>
+
+          <span className={`flex items-center gap-1 ${gasLabelClass}`}>
+            <span className="font-medium">DSL</span>
+            <span className={gasItemClass}>
+              {formatFuelPrice(fuelPriceContext.prices.diesel)}
+            </span>
+          </span>
+        </div>
 
         {fuelPriceContext.note && (
-          <p className={`mt-1 text-[11px] md:text-xs ${noteClass}`}>
+          <p className={`mt-2 text-[11px] md:text-xs ${noteClass}`}>
             {fuelPriceContext.note}
           </p>
         )}
       </div>
+    </div>
   );
 }
 

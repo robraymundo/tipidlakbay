@@ -12,11 +12,12 @@ function CostSummary({
   cheapestRoute,
   darkMode,
   hasCalculated,
+  loading,
 }) {
   if (!hasCalculated) {
     return (
       <section
-        className={`rounded-2xl p-4 shadow-sm ring-1 ${
+        className={`min-h-[190px] rounded-2xl p-4 shadow-sm ring-1 transition-all duration-300 ${
           darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
         }`}
       >
@@ -36,11 +37,23 @@ function CostSummary({
 
   return (
     <section
-      className={`rounded-2xl p-4 shadow-sm ring-1 ${
+      className={`min-h-[190px] rounded-2xl p-4 shadow-sm ring-1 transition-all duration-300 ${
         darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
       }`}
     >
-      <h2 className="mb-3 text-lg font-semibold">Trip Summary</h2>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold">Trip Summary</h2>
+
+        {loading && (
+          <span
+            className={`text-xs ${
+              darkMode ? "text-slate-400" : "text-slate-500"
+            }`}
+          >
+            Updating summary...
+          </span>
+        )}
+      </div>
 
       <div className="space-y-3">
         <div
@@ -123,7 +136,7 @@ function CostSummary({
 
         <div
           className={`rounded-xl p-3 text-sm ${
-            darkMode ? "bg-slate-950/40" : "bg-slate-50"
+            darkMode ? "bg-slate-950/40 text-slate-300" : "bg-slate-50 text-slate-600"
           }`}
         >
           This estimate is based on route distance, fuel price, and vehicle fuel

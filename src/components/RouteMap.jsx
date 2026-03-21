@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { formatFuelPrice } from "../utils/fuelPrices";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -78,6 +79,7 @@ function RouteMap({
   destinationCoords,
   selectedRouteId,
   darkMode,
+  fuelPriceContext,
 }) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
@@ -215,18 +217,53 @@ function RouteMap({
     renderMapData();
   }, [routes, originCoords, destinationCoords, selectedRouteId]);
 
-  return (
-    <div className="relative h-[220px] overflow-hidden rounded-xl md:h-[240px]">
-      <div ref={mapContainerRef} className="h-full w-full" />
+  const gasRowClass = darkMode
+    ? "border-slate-700 bg-slate-800/80 text-slate-200"
+    : "border-slate-200 bg-slate-50 text-slate-700";
 
-      {!routes.length && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-900/20 backdrop-blur-[1px]">
-          <div className="rounded-lg bg-white/90 px-3.5 py-2.5 text-center text-sm font-medium text-slate-700 shadow">
-            Enter your starting point and destination, then calculate your trip.
+  const noteClass = darkMode ? "text-slate-400" : "text-slate-500";
+
+  return (
+    <div className="space-y-2.5">
+      <div className="relative h-[220px] overflow-hidden rounded-xl md:h-[240px]">
+        <div ref={mapContainerRef} className="h-full w-full" />
+
+        {!routes.length && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-900/20 backdrop-blur-[1px]">
+            <div className="rounded-lg bg-white/90 px-3.5 py-2.5 text-center text-sm font-medium text-slate-700 shadow">
+              Enter your starting point and destination, then calculate your trip.
+            </div>
           </div>
+        )}
+      </div>
+      <p className="text-sm font-semibold">Gas Prices</p>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs md:text-sm">
+          <span>
+            RON 91:{" "}
+            <span className="font-semibold">
+              {formatFuelPrice(fuelPriceContext.prices.ron91)}
+            </span>
+          </span>
+          <span>
+            RON 95:{" "}
+            <span className="font-semibold">
+              {formatFuelPrice(fuelPriceContext.prices.premium)}
+            </span>
+          </span>
+          <span>
+            DSL:{" "}
+            <span className="font-semibold">
+              {formatFuelPrice(fuelPriceContext.prices.diesel)}
+            </span>
+          </span>
         </div>
-      )}
-    </div>
+
+        {fuelPriceContext.note && (
+          <p className={`mt-1 text-[11px] md:text-xs ${noteClass}`}>
+            {fuelPriceContext.note}
+          </p>
+        )}
+      </div>
   );
 }
 

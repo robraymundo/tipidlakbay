@@ -5,6 +5,7 @@ import CostSummary from "./components/CostSummary";
 import RouteMap from "./components/RouteMap";
 import { calculateTripCost } from "./utils/calculateTrip";
 import { geocodePlace, getRoutes } from "./services/mapbox";
+import { getFuelPriceContext } from "./utils/fuelPrices";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -29,6 +30,10 @@ function App() {
     parkingFee: "",
     roundTrip: false,
   });
+
+  const fuelPriceContext = useMemo(() => {
+    return getFuelPriceContext(tripData.origin);
+  }, [tripData.origin]);
 
   const getRecommendedRouteId = (routes, submittedTripData) => {
     if (!routes.length) return null;
@@ -242,6 +247,7 @@ function App() {
                     destinationCoords={mapLocations.destination}
                     selectedRouteId={selectedRouteId}
                     darkMode={darkMode}
+                    fuelPriceContext={fuelPriceContext}
                   />
                 </div>
 

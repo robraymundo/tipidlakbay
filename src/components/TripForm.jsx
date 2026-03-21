@@ -411,7 +411,7 @@ function TripForm({
         </div>
 
         <div>
-          <label className={labelClass}>Fuel Price (₱ / L)</label>
+          <label className={labelClass}>Fuel Price (PHP / L)</label>
 
           <div className="relative">
             <input
@@ -449,9 +449,7 @@ function TripForm({
             )}
           </div>
 
-          {errors.fuelPrice && (
-            <p className={errorTextClass}>{errors.fuelPrice}</p>
-          )}
+          {errors.fuelPrice && <p className={errorTextClass}>{errors.fuelPrice}</p>}
         </div>
 
         <div className="md:col-span-2">

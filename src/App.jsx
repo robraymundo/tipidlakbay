@@ -195,11 +195,11 @@ function App() {
             : "border-slate-200 bg-slate-100/85 text-slate-900"
         }`}
       >
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-2.5">
           <div>
-            <h1 className="text-2xl font-bold md:text-3xl">TipidLakbay</h1>
+            <h1 className="text-xl font-bold md:text-2xl">TipidLakbay</h1>
             <p
-              className={`mt-1 text-sm ${
+              className={`mt-0.5 text-xs md:text-sm ${
                 darkMode ? "text-slate-300" : "text-slate-600"
               }`}
             >
@@ -209,7 +209,7 @@ function App() {
 
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
+            className={`rounded-lg px-3.5 py-2 text-sm font-medium transition ${
               darkMode
                 ? "bg-white text-slate-900 hover:bg-slate-200"
                 : "bg-slate-900 text-white hover:bg-slate-700"
@@ -225,16 +225,16 @@ function App() {
           darkMode ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-900"
         }`}
       >
-        <div className="mx-auto w-full max-w-6xl px-4 py-5 md:py-6">
-          <div className="grid gap-5 lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="mx-auto w-full max-w-5xl px-4 py-4 md:py-5">
+          <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
             <section
-              className={`rounded-2xl p-4 shadow-sm ring-1 ${
+              className={`rounded-xl p-3.5 shadow-sm ring-1 ${
                 darkMode
                   ? "bg-slate-900 ring-slate-800"
                   : "bg-white ring-slate-200"
               }`}
             >
-              <div className="space-y-5">
+              <div className="space-y-4">
                 <div>
                   <RouteMap
                     routes={hasCalculated ? displayRoutes : []}
@@ -258,19 +258,21 @@ function App() {
               </div>
             </section>
 
-            <div className="space-y-5">
+            <div className="space-y-4">
               <div
-                className={`rounded-2xl p-4 shadow-sm ring-1 ${
+                className={`rounded-xl p-3.5 shadow-sm ring-1 ${
                   darkMode
                     ? "bg-slate-900 ring-slate-800"
                     : "bg-white ring-slate-200"
                 }`}
               >
-                <h2 className="mb-3 text-lg font-semibold">Route Comparison</h2>
+                <h2 className="mb-2.5 text-base font-semibold md:text-lg">
+                  Route Comparison
+                </h2>
 
                 {routeError ? (
                   <div
-                    className={`rounded-xl p-4 text-sm ${
+                    className={`rounded-lg p-3.5 text-sm ${
                       darkMode
                         ? "bg-red-950 text-red-200"
                         : "bg-red-50 text-red-700"
@@ -280,7 +282,7 @@ function App() {
                   </div>
                 ) : loading ? (
                   <div
-                    className={`rounded-xl p-4 text-sm ${
+                    className={`rounded-lg p-3.5 text-sm ${
                       darkMode
                         ? "bg-slate-800 text-slate-300"
                         : "bg-slate-50 text-slate-600"
@@ -290,7 +292,7 @@ function App() {
                   </div>
                 ) : !hasCalculated ? (
                   <div
-                    className={`rounded-xl p-4 text-sm ${
+                    className={`rounded-lg p-3.5 text-sm ${
                       darkMode
                         ? "bg-slate-800 text-slate-300"
                         : "bg-slate-50 text-slate-600"
@@ -300,7 +302,7 @@ function App() {
                     <span className="font-semibold">Calculate Trip</span>.
                   </div>
                 ) : (
-                  <div className="grid gap-4">
+                  <div className="grid gap-3">
                     {displayRoutes.map((route) => (
                       <RouteCard
                         key={route.id}

@@ -182,7 +182,7 @@ function TripForm({
   }, []);
 
   const baseInputClass =
-    "w-full rounded-xl border px-4 py-3 outline-none transition";
+    "w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition md:text-[15px]";
 
   const defaultInputClass = darkMode
     ? "border-slate-700 bg-slate-800 text-white placeholder:text-slate-400 focus:border-slate-500"
@@ -195,29 +195,35 @@ function TripForm({
       errors[fieldName] ? errorInputClass : defaultInputClass
     } ${extra}`;
 
-  const dropdownClass = `absolute z-20 mt-2 w-full overflow-hidden rounded-xl border shadow-lg ${
+  const dropdownClass = `absolute z-20 mt-1.5 w-full overflow-hidden rounded-lg border shadow-lg ${
     darkMode
       ? "border-slate-700 bg-slate-900"
       : "border-slate-200 bg-white"
   }`;
 
-  const dropdownItemClass = `w-full px-4 py-3 text-left text-sm transition ${
+  const dropdownItemClass = `w-full px-3.5 py-2.5 text-left text-sm transition ${
     darkMode
       ? "text-slate-200 hover:bg-slate-800"
       : "text-slate-700 hover:bg-slate-50"
   }`;
 
-  const errorTextClass = "mt-1 text-sm text-red-500";
+  const errorTextClass = "mt-1 text-xs text-red-500";
+
+  const labelClass = "mb-1 block text-[13px] font-semibold";
+
+  const clearButtonClass = `absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full transition ${
+    darkMode
+      ? "text-slate-200 hover:bg-slate-700 hover:text-white"
+      : "text-slate-500 hover:bg-slate-200 hover:text-slate-900"
+  }`;
 
   const formContent = (
     <>
-      {!embedded && <h2 className="mb-4 text-xl font-semibold">Trip Details</h2>}
+      {!embedded && <h2 className="mb-3 text-lg font-semibold">Trip Details</h2>}
 
-      <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+      <form onSubmit={handleSubmit} className="grid gap-3 md:grid-cols-2">
         <div ref={originRef} className="relative md:col-span-2">
-          <label className="mb-1 block text-sm font-medium">
-            Starting Point
-          </label>
+          <label className={labelClass}>Starting Point</label>
 
           <div className="relative">
             <input
@@ -227,7 +233,7 @@ function TripForm({
               onChange={handleChange}
               onFocus={() => setActiveField("origin")}
               placeholder="e.g. Ilagan, Isabela"
-              className={getInputClass("origin", "pr-12")}
+              className={getInputClass("origin", "pr-10")}
               autoComplete="off"
             />
 
@@ -235,11 +241,7 @@ function TripForm({
               <button
                 type="button"
                 onClick={() => clearField("origin")}
-                className={`absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition ${
-                  darkMode
-                    ? "text-slate-200 hover:bg-slate-700 hover:text-white"
-                    : "text-slate-500 hover:bg-slate-200 hover:text-slate-900"
-                }`}
+                className={clearButtonClass}
                 aria-label="Clear origin"
               >
                 <svg
@@ -283,7 +285,7 @@ function TripForm({
         </div>
 
         <div ref={destinationRef} className="relative md:col-span-2">
-          <label className="mb-1 block text-sm font-medium">Destination</label>
+          <label className={labelClass}>Destination</label>
 
           <div className="relative">
             <input
@@ -293,7 +295,7 @@ function TripForm({
               onChange={handleChange}
               onFocus={() => setActiveField("destination")}
               placeholder="e.g. Tuguegarao City, Cagayan"
-              className={getInputClass("destination", "pr-12")}
+              className={getInputClass("destination", "pr-10")}
               autoComplete="off"
             />
 
@@ -301,11 +303,7 @@ function TripForm({
               <button
                 type="button"
                 onClick={() => clearField("destination")}
-                className={`absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition ${
-                  darkMode
-                    ? "text-slate-200 hover:bg-slate-700 hover:text-white"
-                    : "text-slate-500 hover:bg-slate-200 hover:text-slate-900"
-                }`}
+                className={clearButtonClass}
                 aria-label="Clear destination"
               >
                 <svg
@@ -353,7 +351,7 @@ function TripForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">Vehicle Type</label>
+          <label className={labelClass}>Vehicle Type</label>
           <select
             name="vehicleType"
             value={tripData.vehicleType}
@@ -369,9 +367,7 @@ function TripForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">
-            Fuel Efficiency (km/L)
-          </label>
+          <label className={labelClass}>Fuel Efficiency (km/L)</label>
 
           <div className="relative">
             <input
@@ -382,18 +378,14 @@ function TripForm({
               placeholder="e.g. 14"
               min="1"
               step="0.1"
-              className={getInputClass("fuelEfficiency", "pr-12")}
+              className={getInputClass("fuelEfficiency", "pr-10")}
             />
 
             {tripData.fuelEfficiency && (
               <button
                 type="button"
                 onClick={() => clearField("fuelEfficiency")}
-                className={`absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition ${
-                  darkMode
-                    ? "text-slate-200 hover:bg-slate-700 hover:text-white"
-                    : "text-slate-500 hover:bg-slate-200 hover:text-slate-900"
-                }`}
+                className={clearButtonClass}
                 aria-label="Clear fuel efficiency"
               >
                 <svg
@@ -419,9 +411,7 @@ function TripForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">
-            Fuel Price (₱ / L)
-          </label>
+          <label className={labelClass}>Fuel Price (₱ / L)</label>
 
           <div className="relative">
             <input
@@ -432,18 +422,14 @@ function TripForm({
               placeholder="e.g. 65"
               min="0"
               step="0.01"
-              className={getInputClass("fuelPrice", "pr-12")}
+              className={getInputClass("fuelPrice", "pr-10")}
             />
 
             {tripData.fuelPrice && (
               <button
                 type="button"
                 onClick={() => clearField("fuelPrice")}
-                className={`absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition ${
-                  darkMode
-                    ? "text-slate-200 hover:bg-slate-700 hover:text-white"
-                    : "text-slate-500 hover:bg-slate-200 hover:text-slate-900"
-                }`}
+                className={clearButtonClass}
                 aria-label="Clear fuel price"
               >
                 <svg
@@ -472,7 +458,7 @@ function TripForm({
           <button
             type="submit"
             disabled={loading}
-            className={`my-5 w-full rounded-xl px-4 py-3 font-semibold transition ${
+            className={`mt-2 w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
               darkMode
                 ? "bg-white text-slate-900 hover:bg-slate-200 disabled:bg-slate-300"
                 : "bg-slate-900 text-white hover:bg-slate-700 disabled:bg-slate-400"
@@ -491,7 +477,7 @@ function TripForm({
 
   return (
     <section
-      className={`rounded-2xl p-5 shadow-sm ring-1 ${
+      className={`rounded-2xl p-4 shadow-sm ring-1 ${
         darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
       }`}
     >

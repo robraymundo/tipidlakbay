@@ -30,6 +30,42 @@ function App() {
     roundTrip: false,
   });
 
+  const getRecommendedRouteId = (routes, submittedTripData) => {
+    if (!routes.length) return null;
+
+    const fuelEfficiency = Number(submittedTripData.fuelEfficiency);
+    const fuelPrice = Number(submittedTripData.fuelPrice);
+    const tollFee = Number(submittedTripData.tollFee || 0);
+    const parkingFee = Number(submittedTripData.parkingFee || 0);
+
+    const routesWithResults = routes.map((route) => ({
+      ...route,
+      result:
+        fuelEfficiency && fuelPrice
+          ? calculateTripCost(
+              route.distance,
+              fuelEfficiency,
+              fuelPrice,
+              tollFee,
+              parkingFee,
+              submittedTripData.roundTrip
+            )
+          : null,
+    }));
+
+    const validRoutes = routesWithResults.filter((route) => route.result);
+
+    if (!validRoutes.length) {
+      return routes[0]?.id ?? null;
+    }
+
+    return validRoutes.reduce((minRoute, currentRoute) =>
+      currentRoute.result.totalCost < minRoute.result.totalCost
+        ? currentRoute
+        : minRoute
+    ).id;
+  };
+
   const handleCalculate = async () => {
     try {
       setLoading(true);
@@ -45,23 +81,18 @@ function App() {
       const destinationCoords = await geocodePlace(submittedTripData.destination);
 
       const fetchedRoutes = await getRoutes(originCoords, destinationCoords);
+      const recommendedRouteId = getRecommendedRouteId(
+        fetchedRoutes,
+        submittedTripData
+      );
 
-      const labeledRoutes = fetchedRoutes.map((route, index) => ({
-        ...route,
-        label:
-          index === 0
-            ? "Recommended Route"
-            : index === 1
-            ? "Alternative Route"
-            : "Extra Route",
-      }));
-
-      setLiveRoutes(labeledRoutes);
+      setLiveRoutes(fetchedRoutes);
       setMapLocations({
         origin: originCoords,
         destination: destinationCoords,
       });
       setAppliedTripData(submittedTripData);
+      setSelectedRouteId(recommendedRouteId);
       setHasCalculated(true);
     } catch (error) {
       console.error(error);
@@ -79,8 +110,9 @@ function App() {
     const tollFee = Number(appliedTripData.tollFee || 0);
     const parkingFee = Number(appliedTripData.parkingFee || 0);
 
-    return liveRoutes.map((route) => ({
+    return liveRoutes.map((route, index) => ({
       ...route,
+      name: route.name || `Route ${String.fromCharCode(65 + index)}`,
       result:
         fuelEfficiency && fuelPrice
           ? calculateTripCost(
@@ -122,26 +154,37 @@ function App() {
     ).id;
   }, [computedRoutes]);
 
+  const displayRoutes = useMemo(() => {
+    return computedRoutes.map((route) => ({
+      ...route,
+      label:
+        route.id === cheapestRouteId
+          ? "Recommended Route"
+          : "Alternative Route",
+    }));
+  }, [computedRoutes, cheapestRouteId]);
+
   useEffect(() => {
-    if (!hasCalculated || !computedRoutes.length) {
+    if (!hasCalculated || !displayRoutes.length) {
       setSelectedRouteId(null);
       return;
     }
 
-    const selectedStillExists = computedRoutes.some(
+    const selectedStillExists = displayRoutes.some(
       (route) => route.id === selectedRouteId
     );
 
     if (!selectedStillExists) {
-      setSelectedRouteId(cheapestRouteId ?? computedRoutes[0].id);
+      setSelectedRouteId(cheapestRouteId ?? displayRoutes[0]?.id ?? null);
     }
-  }, [hasCalculated, computedRoutes, cheapestRouteId, selectedRouteId]);
+  }, [hasCalculated, displayRoutes, cheapestRouteId, selectedRouteId]);
 
   const selectedSummary = useMemo(() => {
     if (!hasCalculated) return null;
-    const route = computedRoutes.find((item) => item.id === cheapestRouteId);
+
+    const route = displayRoutes.find((item) => item.id === cheapestRouteId);
     return route?.result || null;
-  }, [computedRoutes, cheapestRouteId, hasCalculated]);
+  }, [displayRoutes, cheapestRouteId, hasCalculated]);
 
   return (
     <>
@@ -194,7 +237,7 @@ function App() {
               <div className="space-y-5">
                 <div>
                   <RouteMap
-                    routes={hasCalculated ? liveRoutes : []}
+                    routes={hasCalculated ? displayRoutes : []}
                     originCoords={mapLocations.origin}
                     destinationCoords={mapLocations.destination}
                     selectedRouteId={selectedRouteId}
@@ -203,7 +246,6 @@ function App() {
                 </div>
 
                 <div>
-                  <h2 className="mb-3 text-lg font-semibold">Trip Details</h2>
                   <TripForm
                     tripData={tripData}
                     setTripData={setTripData}
@@ -259,7 +301,7 @@ function App() {
                   </div>
                 ) : (
                   <div className="grid gap-4">
-                    {computedRoutes.map((route) => (
+                    {displayRoutes.map((route) => (
                       <RouteCard
                         key={route.id}
                         route={route}
@@ -280,9 +322,8 @@ function App() {
                 selectedSummary={selectedSummary}
                 cheapestRoute={
                   hasCalculated
-                    ? computedRoutes.find(
-                        (route) => route.id === cheapestRouteId
-                      ) || null
+                    ? displayRoutes.find((route) => route.id === cheapestRouteId) ||
+                      null
                     : null
                 }
                 darkMode={darkMode}

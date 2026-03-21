@@ -100,8 +100,13 @@ function RouteMap({
 
     ensureRouteLayers(map);
 
-    const activeRouteId =
-      selectedRouteIdRef.current ?? routesRef.current[0]?.id ?? null;
+    const selectedExists = routesRef.current.some(
+      (route) => route.id === selectedRouteIdRef.current
+    );
+
+    const activeRouteId = selectedExists
+      ? selectedRouteIdRef.current
+      : routesRef.current[0]?.id ?? null;
 
     const features = routesRef.current.map((route) => ({
       type: "Feature",

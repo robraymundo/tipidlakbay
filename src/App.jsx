@@ -19,6 +19,7 @@ function App() {
     origin: null,
     destination: null,
   });
+  const [resultAnimationKey, setResultAnimationKey] = useState(0);
 
   const [tripData, setTripData] = useState({
     origin: "",
@@ -82,7 +83,9 @@ function App() {
 
       const calculationPromise = (async () => {
         const originCoords = await geocodePlace(submittedTripData.origin);
-        const destinationCoords = await geocodePlace(submittedTripData.destination);
+        const destinationCoords = await geocodePlace(
+          submittedTripData.destination
+        );
 
         const fetchedRoutes = await getRoutes(originCoords, destinationCoords);
         const recommendedRouteId = getRecommendedRouteId(
@@ -109,6 +112,7 @@ function App() {
       setSelectedRouteId(result.recommendedRouteId);
       setHasCalculated(true);
       setRouteError("");
+      setResultAnimationKey((prev) => prev + 1);
     } catch (error) {
       console.error(error);
       setRouteError(error.message || "Unable to calculate trip.");
@@ -203,6 +207,21 @@ function App() {
 
   return (
     <>
+      <style>
+        {`
+          @keyframes fadeSlideUp {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
+
       <header
         className={`sticky top-0 z-50 border-b backdrop-blur ${
           darkMode
@@ -308,23 +327,45 @@ function App() {
                     <span className="font-semibold">Calculate Trip</span>.
                   </div>
                 ) : (
-                  <div className="grid gap-3">
-                    {displayRoutes.map((route) => (
-                      <RouteCard
+                  <div
+                    key={`routes-${resultAnimationKey}`}
+                    className="grid gap-3"
+                  >
+                    {displayRoutes.map((route, index) => (
+                      <div
                         key={route.id}
-                        route={route}
-                        isSelected={route.id === selectedRouteId}
-                        isCheapest={route.id === cheapestRouteId}
-                        isFastest={route.id === fastestRouteId}
-                        isMostEfficient={route.id === mostEfficientRouteId}
-                        darkMode={darkMode}
-                        onSelect={() => setSelectedRouteId(route.id)}
-                      />
+                        style={{
+                          animation: `fadeSlideUp 450ms ease-out ${
+                            index * 80
+                          }ms both`,
+                        }}
+                      >
+                        <RouteCard
+                          route={route}
+                          isSelected={route.id === selectedRouteId}
+                          isCheapest={route.id === cheapestRouteId}
+                          isFastest={route.id === fastestRouteId}
+                          isMostEfficient={route.id === mostEfficientRouteId}
+                          darkMode={darkMode}
+                          onSelect={() => setSelectedRouteId(route.id)}
+                        />
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
-              <div className="transition-all duration-300">
+
+              <div
+                className="transition-all duration-300"
+                key={`summary-${resultAnimationKey}`}
+                style={
+                  hasCalculated
+                    ? {
+                        animation: "fadeSlideUp 500ms ease-out 120ms both",
+                      }
+                    : undefined
+                }
+              >
                 <CostSummary
                   tripData={appliedTripData || tripData}
                   selectedSummary={selectedSummary}

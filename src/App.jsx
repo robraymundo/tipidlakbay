@@ -75,30 +75,40 @@ function App() {
     try {
       setLoading(true);
       setRouteError("");
-      setHasCalculated(false);
-      setLiveRoutes([]);
-      setSelectedRouteId(null);
-      setMapLocations({ origin: null, destination: null });
 
       const submittedTripData = { ...tripData };
 
-      const originCoords = await geocodePlace(submittedTripData.origin);
-      const destinationCoords = await geocodePlace(submittedTripData.destination);
+      const minimumDelay = new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const fetchedRoutes = await getRoutes(originCoords, destinationCoords);
-      const recommendedRouteId = getRecommendedRouteId(
-        fetchedRoutes,
-        submittedTripData
-      );
+      const calculationPromise = (async () => {
+        const originCoords = await geocodePlace(submittedTripData.origin);
+        const destinationCoords = await geocodePlace(submittedTripData.destination);
 
-      setLiveRoutes(fetchedRoutes);
+        const fetchedRoutes = await getRoutes(originCoords, destinationCoords);
+        const recommendedRouteId = getRecommendedRouteId(
+          fetchedRoutes,
+          submittedTripData
+        );
+
+        return {
+          originCoords,
+          destinationCoords,
+          fetchedRoutes,
+          recommendedRouteId,
+        };
+      })();
+
+      const [, result] = await Promise.all([minimumDelay, calculationPromise]);
+
+      setLiveRoutes(result.fetchedRoutes);
       setMapLocations({
-        origin: originCoords,
-        destination: destinationCoords,
+        origin: result.originCoords,
+        destination: result.destinationCoords,
       });
       setAppliedTripData(submittedTripData);
-      setSelectedRouteId(recommendedRouteId);
+      setSelectedRouteId(result.recommendedRouteId);
       setHasCalculated(true);
+      setRouteError("");
     } catch (error) {
       console.error(error);
       setRouteError(error.message || "Unable to calculate trip.");
@@ -233,7 +243,7 @@ function App() {
         <div className="mx-auto w-full max-w-5xl px-4 py-4 md:py-5">
           <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
             <section
-              className={`rounded-xl p-3.5 shadow-sm ring-1 ${
+              className={`rounded-xl p-3.5 shadow-sm ring-1 transition-all duration-300 ${
                 darkMode
                   ? "bg-slate-900 ring-slate-800"
                   : "bg-white ring-slate-200"
@@ -266,7 +276,7 @@ function App() {
 
             <div className="space-y-4">
               <div
-                className={`rounded-xl p-3.5 shadow-sm ring-1 ${
+                className={`min-h-[320px] rounded-xl p-3.5 shadow-sm ring-1 transition-all duration-300 ${
                   darkMode
                     ? "bg-slate-900 ring-slate-800"
                     : "bg-white ring-slate-200"
@@ -286,7 +296,7 @@ function App() {
                   >
                     {routeError}
                   </div>
-                ) : loading ? (
+                ) : loading && !hasCalculated ? (
                   <div
                     className={`rounded-lg p-3.5 text-sm ${
                       darkMode
@@ -323,20 +333,36 @@ function App() {
                     ))}
                   </div>
                 )}
+
+                {loading && hasCalculated && (
+                  <div
+                    className={`mt-3 rounded-lg px-3 py-2 text-xs ${
+                      darkMode
+                        ? "bg-slate-800 text-slate-300"
+                        : "bg-slate-50 text-slate-600"
+                    }`}
+                  >
+                    Updating routes...
+                  </div>
+                )}
               </div>
 
-              <CostSummary
-                tripData={appliedTripData || tripData}
-                selectedSummary={selectedSummary}
-                cheapestRoute={
-                  hasCalculated
-                    ? displayRoutes.find((route) => route.id === cheapestRouteId) ||
-                      null
-                    : null
-                }
-                darkMode={darkMode}
-                hasCalculated={hasCalculated}
-              />
+              <div className="transition-all duration-300">
+                <CostSummary
+                  tripData={appliedTripData || tripData}
+                  selectedSummary={selectedSummary}
+                  cheapestRoute={
+                    hasCalculated
+                      ? displayRoutes.find(
+                          (route) => route.id === cheapestRouteId
+                        ) || null
+                      : null
+                  }
+                  darkMode={darkMode}
+                  hasCalculated={hasCalculated}
+                  loading={loading}
+                />
+              </div>
             </div>
           </div>
         </div>

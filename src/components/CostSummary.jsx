@@ -17,7 +17,7 @@ function CostSummary({
   if (!hasCalculated) {
     return (
       <section
-        className={`min-h-[190px] rounded-2xl p-4 shadow-sm ring-1 transition-all duration-300 ${
+        className={`rounded-2xl p-4 shadow-sm ring-1 transition-all duration-300 ${
           darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
         }`}
       >
@@ -37,7 +37,7 @@ function CostSummary({
 
   return (
     <section
-      className={`min-h-[190px] rounded-2xl p-4 shadow-sm ring-1 transition-all duration-300 ${
+      className={`h-fit rounded-2xl p-4 shadow-sm ring-1 transition-all duration-300 ${
         darkMode ? "bg-slate-900 ring-slate-800" : "bg-white ring-slate-200"
       }`}
     >

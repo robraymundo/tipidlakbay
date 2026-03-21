@@ -276,7 +276,7 @@ function App() {
 
             <div className="space-y-4">
               <div
-                className={`min-h-[320px] rounded-xl p-3.5 shadow-sm ring-1 transition-all duration-300 ${
+                className={`h-fit rounded-xl p-3.5 shadow-sm ring-1 transition-all duration-300 ${
                   darkMode
                     ? "bg-slate-900 ring-slate-800"
                     : "bg-white ring-slate-200"

@@ -241,184 +241,204 @@ function App() {
         `}
       </style>
 
-      <header
-        className={`sticky top-0 z-50 border-b backdrop-blur ${
-          darkMode
-            ? "border-slate-800 bg-slate-950 text-white"
-            : "border-slate-200 bg-slate-100/85 text-slate-900"
-        }`}
-      >
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-2.5">
-          <div>
-            <h1 className="text-xl font-bold md:text-2xl">TipidLakbay</h1>
-            <p
-              className={`mt-0.5 text-xs md:text-sm ${
-                darkMode ? "text-slate-300" : "text-slate-600"
-              }`}
-            >
-              Smart trip budgeting in the midst of rising fuel prices.
-            </p>
-          </div>
-
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className={`rounded-lg px-3.5 py-2 text-sm font-medium transition ${
-              darkMode
-                ? "bg-white text-slate-900 hover:bg-slate-200"
-                : "bg-slate-900 text-white hover:bg-slate-700"
-            }`}
-          >
-            {darkMode ? "Light Mode" : "Dark Mode"}
-          </button>
-        </div>
-      </header>
-
-      <main
-        className={`min-h-screen w-full transition-colors duration-300 ${
+      <div
+        className={`flex min-h-screen flex-col transition-colors duration-300 ${
           darkMode ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-900"
         }`}
       >
-        <div className="mx-auto w-full max-w-5xl px-4 py-4 md:py-5">
-          <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-            <section
-              className={`rounded-xl p-3.5 shadow-sm ring-1 transition-all duration-300 ${
+        <header
+          className={`sticky top-0 z-50 border-b backdrop-blur ${
+            darkMode
+              ? "border-slate-800 bg-slate-950 text-white"
+              : "border-slate-200 bg-slate-100/85 text-slate-900"
+          }`}
+        >
+          <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-2.5">
+            <div>
+              <h1 className="text-xl font-bold md:text-2xl">TipidLakbay</h1>
+              <p
+                className={`mt-0.5 text-xs md:text-sm ${
+                  darkMode ? "text-slate-300" : "text-slate-600"
+                }`}
+              >
+                Smart trip budgeting in the midst of rising fuel prices.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`rounded-lg px-3.5 py-2 text-sm font-medium transition ${
                 darkMode
-                  ? "bg-slate-900 ring-slate-800"
-                  : "bg-white ring-slate-200"
+                  ? "bg-white text-slate-900 hover:bg-slate-200"
+                  : "bg-slate-900 text-white hover:bg-slate-700"
               }`}
             >
-              <div className="space-y-4">
-                <div>
-                  <RouteMap
-                    routes={hasCalculated ? displayRoutes : []}
-                    originCoords={mapLocations.origin}
-                    destinationCoords={mapLocations.destination}
-                    selectedRouteId={selectedRouteId}
-                    darkMode={darkMode}
-                    fuelPriceContext={fuelPriceContext}
-                  />
-                </div>
+              {darkMode ? "Light Mode" : "Dark Mode"}
+            </button>
+          </div>
+        </header>
 
-                <div>
-                  <TripForm
-                    tripData={tripData}
-                    setTripData={setTripData}
-                    darkMode={darkMode}
-                    onCalculate={handleCalculate}
-                    loading={loading}
-                    embedded
-                  />
-                </div>
-              </div>
-            </section>
-
-            <div className="space-y-4">
-              <div
-                ref={summarySectionRef}
-                className="scroll-mt-20"
-                key={`summary-${resultAnimationKey}`}
-                style={
-                  hasCalculated
-                    ? {
-                        animation: "fadeSlideUp 480ms ease-out 80ms both",
-                      }
-                    : undefined
-                }
-              >
-                <CostSummary
-                  tripData={appliedTripData || tripData}
-                  selectedSummary={selectedSummary}
-                  cheapestRoute={
-                    hasCalculated
-                      ? displayRoutes.find(
-                          (route) => route.id === cheapestRouteId
-                        ) || null
-                      : null
-                  }
-                  darkMode={darkMode}
-                  hasCalculated={hasCalculated}
-                  loading={loading}
-                />
-              </div>
-
+        <main className="flex-1 w-full">
+          <div className="mx-auto w-full max-w-5xl px-4 py-4 md:py-5">
+            <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
               <section
-                className={`h-fit rounded-xl p-3.5 shadow-sm ring-1 transition-all duration-300 ${
+                className={`rounded-xl p-3.5 shadow-sm ring-1 transition-all duration-300 ${
                   darkMode
                     ? "bg-slate-900 ring-slate-800"
                     : "bg-white ring-slate-200"
                 }`}
               >
-                {routeError ? (
-                  <>
-                    <h2 className="mb-2.5 text-base font-semibold md:text-lg">
-                      Route Comparison
-                    </h2>
-                    <div
-                      className={`rounded-lg p-3.5 text-sm ${
-                        darkMode
-                          ? "bg-red-950 text-red-200"
-                          : "bg-red-50 text-red-700"
-                      }`}
-                    >
-                      {routeError}
-                    </div>
-                  </>
-                ) : !hasCalculated ? (
-                  <>
-                    <h2 className="mb-2.5 text-base font-semibold md:text-lg">
-                      Route Comparison
-                    </h2>
-                    <div
-                      className={`rounded-lg p-3.5 text-sm ${
-                        darkMode
-                          ? "bg-slate-800 text-slate-300"
-                          : "bg-slate-50 text-slate-600"
-                      }`}
-                    >
-                      Fill in the trip details and click{" "}
-                      <span className="font-semibold">Calculate Trip</span>.
-                    </div>
-                  </>
-                ) : (
-                  <div
-                    key={`comparison-${resultAnimationKey}`}
-                    style={{
-                      animation: "fadeSlideUp 520ms ease-out 260ms both",
-                    }}
-                  >
-                    <h2 className="mb-2.5 text-base font-semibold md:text-lg">
-                      Route Comparison
-                    </h2>
-
-                    <div className="grid gap-3">
-                      {displayRoutes.map((route, index) => (
-                        <div
-                          key={route.id}
-                          style={{
-                            animation: `fadeSlideUp 420ms ease-out ${
-                              420 + index * 100
-                            }ms both`,
-                          }}
-                        >
-                          <RouteCard
-                            route={route}
-                            isSelected={route.id === selectedRouteId}
-                            isCheapest={route.id === cheapestRouteId}
-                            isFastest={route.id === fastestRouteId}
-                            isMostEfficient={route.id === mostEfficientRouteId}
-                            darkMode={darkMode}
-                            onSelect={() => setSelectedRouteId(route.id)}
-                          />
-                        </div>
-                      ))}
-                    </div>
+                <div className="space-y-4">
+                  <div>
+                    <RouteMap
+                      routes={hasCalculated ? displayRoutes : []}
+                      originCoords={mapLocations.origin}
+                      destinationCoords={mapLocations.destination}
+                      selectedRouteId={selectedRouteId}
+                      darkMode={darkMode}
+                      fuelPriceContext={fuelPriceContext}
+                    />
                   </div>
-                )}
+
+                  <div>
+                    <TripForm
+                      tripData={tripData}
+                      setTripData={setTripData}
+                      darkMode={darkMode}
+                      onCalculate={handleCalculate}
+                      loading={loading}
+                      embedded
+                    />
+                  </div>
+                </div>
               </section>
+
+              <div className="space-y-4">
+                <div
+                  ref={summarySectionRef}
+                  className="scroll-mt-20"
+                  key={`summary-${resultAnimationKey}`}
+                  style={
+                    hasCalculated
+                      ? {
+                          animation: "fadeSlideUp 480ms ease-out 80ms both",
+                        }
+                      : undefined
+                  }
+                >
+                  <CostSummary
+                    tripData={appliedTripData || tripData}
+                    selectedSummary={selectedSummary}
+                    cheapestRoute={
+                      hasCalculated
+                        ? displayRoutes.find(
+                            (route) => route.id === cheapestRouteId
+                          ) || null
+                        : null
+                    }
+                    darkMode={darkMode}
+                    hasCalculated={hasCalculated}
+                    loading={loading}
+                  />
+                </div>
+
+                <section
+                  className={`h-fit rounded-xl p-3.5 shadow-sm ring-1 transition-all duration-300 ${
+                    darkMode
+                      ? "bg-slate-900 ring-slate-800"
+                      : "bg-white ring-slate-200"
+                  }`}
+                >
+                  {routeError ? (
+                    <>
+                      <h2 className="mb-2.5 text-base font-semibold md:text-lg">
+                        Route Comparison
+                      </h2>
+                      <div
+                        className={`rounded-lg p-3.5 text-sm ${
+                          darkMode
+                            ? "bg-red-950 text-red-200"
+                            : "bg-red-50 text-red-700"
+                        }`}
+                      >
+                        {routeError}
+                      </div>
+                    </>
+                  ) : !hasCalculated ? (
+                    <>
+                      <h2 className="mb-2.5 text-base font-semibold md:text-lg">
+                        Route Comparison
+                      </h2>
+                      <div
+                        className={`rounded-lg p-3.5 text-sm ${
+                          darkMode
+                            ? "bg-slate-800 text-slate-300"
+                            : "bg-slate-50 text-slate-600"
+                        }`}
+                      >
+                        Fill in the trip details and click{" "}
+                        <span className="font-semibold">Calculate Trip</span>.
+                      </div>
+                    </>
+                  ) : (
+                    <div
+                      key={`comparison-${resultAnimationKey}`}
+                      style={{
+                        animation: "fadeSlideUp 520ms ease-out 260ms both",
+                      }}
+                    >
+                      <h2 className="mb-2.5 text-base font-semibold md:text-lg">
+                        Route Comparison
+                      </h2>
+
+                      <div className="grid gap-3">
+                        {displayRoutes.map((route, index) => (
+                          <div
+                            key={route.id}
+                            style={{
+                              animation: `fadeSlideUp 420ms ease-out ${
+                                420 + index * 100
+                              }ms both`,
+                            }}
+                          >
+                            <RouteCard
+                              route={route}
+                              isSelected={route.id === selectedRouteId}
+                              isCheapest={route.id === cheapestRouteId}
+                              isFastest={route.id === fastestRouteId}
+                              isMostEfficient={route.id === mostEfficientRouteId}
+                              darkMode={darkMode}
+                              onSelect={() => setSelectedRouteId(route.id)}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </section>
+              </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
+
+        <footer
+          className={`${
+            darkMode
+              ? "bg-slate-950 text-slate-400"
+              : "bg-slate-100 text-slate-500"
+          }`}
+        >
+          <div className="mx-auto mt-6 w-full max-w-5xl px-4">
+            <div
+              className={`mx-auto w-full max-w-3xl border-t py-4 text-center text-sm ${
+                darkMode ? "border-slate-800" : "border-slate-200"
+              }`}
+            >
+              © {new Date().getFullYear()} TipidLakbay
+            </div>
+          </div>
+        </footer>
+      </div>
     </>
   );
 }

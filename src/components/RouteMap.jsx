@@ -237,8 +237,8 @@ function RouteMap({
         <div ref={mapContainerRef} className="h-full w-full" />
 
         {!routes.length && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-900/20 backdrop-blur-[1px]">
-            <div className="rounded-lg bg-white/90 px-3.5 py-2.5 text-center text-sm font-medium text-slate-700 shadow">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-900/20 px-4 backdrop-blur-[1px] sm:px-5">
+            <div className="w-full max-w-md rounded-lg bg-white/90 px-4 py-3 text-center text-sm font-medium leading-relaxed text-slate-700 shadow">
               Enter your starting point and destination, then calculate your trip.
             </div>
           </div>

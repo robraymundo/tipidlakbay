@@ -510,7 +510,7 @@ function TripForm({
   }, []);
 
   const baseInputClass =
-    "w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition md:text-[15px]";
+  "w-full min-h-[46px] rounded-lg border px-3.5 py-2.5 text-base leading-normal outline-none transition md:text-[15px]";
 
   const defaultInputClass = darkMode
     ? "border-slate-700 bg-slate-800 text-white placeholder:text-slate-400 focus:border-slate-500"

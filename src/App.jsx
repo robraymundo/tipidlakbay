@@ -212,7 +212,7 @@ function App() {
           @keyframes fadeSlideUp {
             from {
               opacity: 0;
-              transform: translateY(10px);
+              transform: translateY(14px);
             }
             to {
               opacity: 1;
@@ -295,73 +295,12 @@ function App() {
 
             <div className="space-y-4">
               <div
-                className={`h-fit rounded-xl p-3.5 shadow-sm ring-1 transition-all duration-300 ${
-                  darkMode
-                    ? "bg-slate-900 ring-slate-800"
-                    : "bg-white ring-slate-200"
-                }`}
-              >
-                <h2 className="mb-2.5 text-base font-semibold md:text-lg">
-                  Route Comparison
-                </h2>
-
-                {routeError ? (
-                  <div
-                    className={`rounded-lg p-3.5 text-sm ${
-                      darkMode
-                        ? "bg-red-950 text-red-200"
-                        : "bg-red-50 text-red-700"
-                    }`}
-                  >
-                    {routeError}
-                  </div>
-                ) : !hasCalculated ? (
-                  <div
-                    className={`rounded-lg p-3.5 text-sm ${
-                      darkMode
-                        ? "bg-slate-800 text-slate-300"
-                        : "bg-slate-50 text-slate-600"
-                    }`}
-                  >
-                    Fill in the trip details and click{" "}
-                    <span className="font-semibold">Calculate Trip</span>.
-                  </div>
-                ) : (
-                  <div
-                    key={`routes-${resultAnimationKey}`}
-                    className="grid gap-3"
-                  >
-                    {displayRoutes.map((route, index) => (
-                      <div
-                        key={route.id}
-                        style={{
-                          animation: `fadeSlideUp 450ms ease-out ${
-                            index * 80
-                          }ms both`,
-                        }}
-                      >
-                        <RouteCard
-                          route={route}
-                          isSelected={route.id === selectedRouteId}
-                          isCheapest={route.id === cheapestRouteId}
-                          isFastest={route.id === fastestRouteId}
-                          isMostEfficient={route.id === mostEfficientRouteId}
-                          darkMode={darkMode}
-                          onSelect={() => setSelectedRouteId(route.id)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div
-                className="transition-all duration-300"
                 key={`summary-${resultAnimationKey}`}
+                className="transition-all duration-300"
                 style={
                   hasCalculated
                     ? {
-                        animation: "fadeSlideUp 500ms ease-out 120ms both",
+                        animation: "fadeSlideUp 480ms ease-out 80ms both",
                       }
                     : undefined
                 }
@@ -381,6 +320,81 @@ function App() {
                   loading={loading}
                 />
               </div>
+
+              <section
+                className={`h-fit rounded-xl p-3.5 shadow-sm ring-1 transition-all duration-300 ${
+                  darkMode
+                    ? "bg-slate-900 ring-slate-800"
+                    : "bg-white ring-slate-200"
+                }`}
+              >
+                {routeError ? (
+                  <>
+                    <h2 className="mb-2.5 text-base font-semibold md:text-lg">
+                      Route Comparison
+                    </h2>
+                    <div
+                      className={`rounded-lg p-3.5 text-sm ${
+                        darkMode
+                          ? "bg-red-950 text-red-200"
+                          : "bg-red-50 text-red-700"
+                      }`}
+                    >
+                      {routeError}
+                    </div>
+                  </>
+                ) : !hasCalculated ? (
+                  <>
+                    <h2 className="mb-2.5 text-base font-semibold md:text-lg">
+                      Route Comparison
+                    </h2>
+                    <div
+                      className={`rounded-lg p-3.5 text-sm ${
+                        darkMode
+                          ? "bg-slate-800 text-slate-300"
+                          : "bg-slate-50 text-slate-600"
+                      }`}
+                    >
+                      Fill in the trip details and click{" "}
+                      <span className="font-semibold">Calculate Trip</span>.
+                    </div>
+                  </>
+                ) : (
+                  <div
+                    key={`comparison-${resultAnimationKey}`}
+                    style={{
+                      animation: "fadeSlideUp 520ms ease-out 260ms both",
+                    }}
+                  >
+                    <h2 className="mb-2.5 text-base font-semibold md:text-lg">
+                      Route Comparison
+                    </h2>
+
+                    <div className="grid gap-3">
+                      {displayRoutes.map((route, index) => (
+                        <div
+                          key={route.id}
+                          style={{
+                            animation: `fadeSlideUp 420ms ease-out ${
+                              420 + index * 100
+                            }ms both`,
+                          }}
+                        >
+                          <RouteCard
+                            route={route}
+                            isSelected={route.id === selectedRouteId}
+                            isCheapest={route.id === cheapestRouteId}
+                            isFastest={route.id === fastestRouteId}
+                            isMostEfficient={route.id === mostEfficientRouteId}
+                            darkMode={darkMode}
+                            onSelect={() => setSelectedRouteId(route.id)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </section>
             </div>
           </div>
         </div>

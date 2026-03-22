@@ -6,6 +6,7 @@ import RouteMap from "./components/RouteMap";
 import { calculateTripCost } from "./utils/calculateTrip";
 import { geocodePlace, getRoutes } from "./services/mapbox";
 import { getFuelPriceContext } from "./utils/fuelPrices";
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -447,6 +448,7 @@ function App() {
           </div>
         </footer>
       </div>
+      <Analytics />
     </>
   );
 }

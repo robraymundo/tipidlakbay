@@ -730,8 +730,8 @@ function TripForm({
             disabled={loading}
             className={`mt-2 flex h-11 w-full items-center justify-center rounded-lg px-4 text-sm font-semibold transition-colors ${
               darkMode
-                ? "bg-white text-slate-900 hover:bg-slate-200 disabled:bg-slate-300"
-                : "bg-slate-900 text-white hover:bg-slate-700 disabled:bg-slate-400"
+                ? "bg-red-700 text-white hover:bg-red-900"
+                : "bg-red-700 text-white hover:bg-red-900"
             }`}
           >
             <span className="inline-flex min-w-[120px] items-center justify-center gap-2">

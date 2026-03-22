@@ -27,6 +27,7 @@ function App() {
     origin: "",
     destination: "",
     vehicleType: "car",
+    vehicleModel: "",
     fuelEfficiency: "14",
     fuelPrice: "",
     tollFee: "",

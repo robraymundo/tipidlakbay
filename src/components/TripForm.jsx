@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getPlaceSuggestions } from "../services/mapbox";
 
 const vehicleOptions = [
@@ -7,6 +7,230 @@ const vehicleOptions = [
   { label: "SUV", value: "suv", defaultEfficiency: 10 },
   { label: "Truck", value: "truck", defaultEfficiency: 8 },
 ];
+
+const vehicleEfficiencyDatabase = {
+  motorcycle: [
+    {
+      label: "Honda Click 125",
+      efficiency: 52,
+      keywords: ["honda click 125", "click 125", "click"],
+    },
+    {
+      label: "Honda ADV 160",
+      efficiency: 42,
+      keywords: ["honda adv 160", "adv 160", "adv"],
+    },
+    {
+      label: "Honda PCX 160",
+      efficiency: 45,
+      keywords: ["honda pcx 160", "pcx 160", "pcx"],
+    },
+    {
+      label: "Yamaha NMAX",
+      efficiency: 40,
+      keywords: ["yamaha nmax", "nmax"],
+    },
+    {
+      label: "Yamaha Mio",
+      efficiency: 48,
+      keywords: ["yamaha mio", "mio"],
+    },
+    {
+      label: "Suzuki Raider 150",
+      efficiency: 45,
+      keywords: ["suzuki raider 150", "raider 150", "raider"],
+    },
+  ],
+  car: [
+    {
+      label: "Toyota Vios",
+      efficiency: 16,
+      keywords: ["toyota vios", "vios"],
+    },
+    {
+      label: "Toyota Wigo",
+      efficiency: 20,
+      keywords: ["toyota wigo", "wigo"],
+    },
+    {
+      label: "Honda City",
+      efficiency: 16,
+      keywords: ["honda city", "city"],
+    },
+    {
+      label: "Honda Civic",
+      efficiency: 13,
+      keywords: ["honda civic", "civic"],
+    },
+    {
+      label: "Mitsubishi Mirage G4",
+      efficiency: 19,
+      keywords: ["mitsubishi mirage g4", "mirage g4", "mirage"],
+    },
+    {
+      label: "Nissan Almera",
+      efficiency: 18,
+      keywords: ["nissan almera", "almera"],
+    },
+    {
+      label: "Suzuki Dzire",
+      efficiency: 21,
+      keywords: ["suzuki dzire", "dzire"],
+    },
+    {
+      label: "Toyota Corolla Altis",
+      efficiency: 14,
+      keywords: ["toyota corolla altis", "corolla altis", "altis"],
+    },
+  ],
+  suv: [
+    {
+      label: "Toyota Fortuner",
+      efficiency: 10,
+      keywords: ["toyota fortuner", "fortuner"],
+    },
+    {
+      label: "Mitsubishi Montero Sport",
+      efficiency: 10,
+      keywords: ["mitsubishi montero sport", "montero sport", "montero"],
+    },
+    {
+      label: "Toyota Rush",
+      efficiency: 13,
+      keywords: ["toyota rush", "rush"],
+    },
+    {
+      label: "Honda CR-V",
+      efficiency: 12,
+      keywords: ["honda cr v", "honda crv", "cr v", "crv"],
+    },
+    {
+      label: "Geely Coolray",
+      efficiency: 12,
+      keywords: ["geely coolray", "coolray"],
+    },
+    {
+      label: "Toyota Yaris Cross",
+      efficiency: 16,
+      keywords: ["toyota yaris cross", "yaris cross"],
+    },
+  ],
+  truck: [
+    {
+      label: "Isuzu N-Series",
+      efficiency: 6,
+      keywords: ["isuzu n series", "n series", "isuzu n"],
+    },
+    {
+      label: "Mitsubishi Canter",
+      efficiency: 5.5,
+      keywords: ["mitsubishi canter", "canter"],
+    },
+    {
+      label: "Hino 300",
+      efficiency: 5.5,
+      keywords: ["hino 300", "hino"],
+    },
+    {
+      label: "Fuso Canter",
+      efficiency: 5.5,
+      keywords: ["fuso canter", "fuso"],
+    },
+    {
+      label: "Isuzu Elf",
+      efficiency: 6,
+      keywords: ["isuzu elf", "elf"],
+    },
+  ],
+};
+
+function normalizeVehicleText(value = "") {
+  return String(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getDefaultEfficiency(vehicleType) {
+  return (
+    vehicleOptions.find((vehicle) => vehicle.value === vehicleType)
+      ?.defaultEfficiency ?? 14
+  );
+}
+
+function getExactVehicleMatch(vehicleType, vehicleModel) {
+  const normalizedInput = normalizeVehicleText(vehicleModel);
+  if (!normalizedInput) return null;
+
+  const candidates = vehicleEfficiencyDatabase[vehicleType] ?? [];
+
+  return (
+    candidates.find((candidate) => {
+      const normalizedLabel = normalizeVehicleText(candidate.label);
+      if (normalizedInput === normalizedLabel) return true;
+
+      return candidate.keywords.some(
+        (keyword) => normalizeVehicleText(keyword) === normalizedInput
+      );
+    }) ?? null
+  );
+}
+
+function getVehicleSuggestions(vehicleType, vehicleModel) {
+  const normalizedInput = normalizeVehicleText(vehicleModel);
+  if (!normalizedInput) return [];
+
+  const candidates = vehicleEfficiencyDatabase[vehicleType] ?? [];
+
+  const scoredCandidates = candidates
+    .map((candidate) => {
+      const normalizedLabel = normalizeVehicleText(candidate.label);
+      let score = 0;
+
+      if (normalizedLabel.startsWith(normalizedInput)) {
+        score = 1000 - normalizedLabel.length;
+      } else if (normalizedLabel.includes(normalizedInput)) {
+        score = 800 - normalizedLabel.length;
+      }
+
+      candidate.keywords.forEach((keyword) => {
+        const normalizedKeyword = normalizeVehicleText(keyword);
+
+        if (normalizedKeyword.startsWith(normalizedInput)) {
+          score = Math.max(score, 900 - normalizedKeyword.length);
+        } else if (normalizedKeyword.includes(normalizedInput)) {
+          score = Math.max(score, 700 - normalizedKeyword.length);
+        } else {
+          const inputTokens = normalizedInput.split(" ");
+          const keywordTokens = normalizedKeyword.split(" ");
+          const overlap = keywordTokens.filter((token) =>
+            inputTokens.some((inputToken) => token.startsWith(inputToken))
+          ).length;
+
+          if (overlap > 0) {
+            score = Math.max(score, overlap * 100);
+          }
+        }
+      });
+
+      return { ...candidate, score };
+    })
+    .filter((candidate) => candidate.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  const uniqueSuggestions = [];
+  const seenLabels = new Set();
+
+  scoredCandidates.forEach((candidate) => {
+    if (!seenLabels.has(candidate.label)) {
+      seenLabels.add(candidate.label);
+      uniqueSuggestions.push(candidate);
+    }
+  });
+
+  return uniqueSuggestions.slice(0, 5);
+}
 
 function TripForm({
   tripData,
@@ -17,29 +241,43 @@ function TripForm({
   embedded = false,
 }) {
   const [activeField, setActiveField] = useState(null);
-  const [suggestions, setSuggestions] = useState([]);
+  const [placeSuggestions, setPlaceSuggestions] = useState([]);
+  const [vehicleSuggestions, setVehicleSuggestions] = useState([]);
   const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
   const [errors, setErrors] = useState({});
 
   const originRef = useRef(null);
   const destinationRef = useRef(null);
+  const vehicleModelRef = useRef(null);
+
+  const origin = tripData?.origin ?? "";
+  const destination = tripData?.destination ?? "";
+  const vehicleType = tripData?.vehicleType ?? "car";
+  const vehicleModel = tripData?.vehicleModel ?? "";
+  const fuelEfficiency =
+    tripData?.fuelEfficiency ?? String(getDefaultEfficiency(vehicleType));
+  const fuelPrice = tripData?.fuelPrice ?? "";
+
+  const matchedVehicle = useMemo(() => {
+    return getExactVehicleMatch(vehicleType, vehicleModel);
+  }, [vehicleType, vehicleModel]);
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!tripData.origin.trim()) {
+    if (!origin.trim()) {
       newErrors.origin = "Please enter a starting point.";
     }
 
-    if (!tripData.destination.trim()) {
+    if (!destination.trim()) {
       newErrors.destination = "Please enter a destination.";
     }
 
-    if (!tripData.fuelEfficiency || Number(tripData.fuelEfficiency) <= 0) {
+    if (!fuelEfficiency || Number(fuelEfficiency) <= 0) {
       newErrors.fuelEfficiency = "Please enter a valid fuel efficiency.";
     }
 
-    if (!tripData.fuelPrice || Number(tripData.fuelPrice) <= 0) {
+    if (!fuelPrice || Number(fuelPrice) <= 0) {
       newErrors.fuelPrice = "Please enter a valid fuel price.";
     }
 
@@ -68,15 +306,72 @@ function TripForm({
   };
 
   const handleVehicleChange = (event) => {
+    const nextVehicleType = event.target.value;
     const selectedVehicle = vehicleOptions.find(
-      (vehicle) => vehicle.value === event.target.value
+      (vehicle) => vehicle.value === nextVehicleType
     );
+    const exactMatch = getExactVehicleMatch(nextVehicleType, vehicleModel);
 
     setTripData((prev) => ({
       ...prev,
-      vehicleType: event.target.value,
-      fuelEfficiency: selectedVehicle.defaultEfficiency.toString(),
+      vehicleType: nextVehicleType,
+      fuelEfficiency: String(
+        exactMatch?.efficiency ?? selectedVehicle?.defaultEfficiency ?? 14
+      ),
     }));
+
+    if (vehicleModel.trim()) {
+      setVehicleSuggestions(
+        getVehicleSuggestions(nextVehicleType, vehicleModel)
+      );
+    } else {
+      setVehicleSuggestions([]);
+    }
+
+    if (errors.fuelEfficiency) {
+      setErrors((prev) => ({
+        ...prev,
+        fuelEfficiency: "",
+      }));
+    }
+  };
+
+  const handleVehicleModelChange = (event) => {
+    const value = event.target.value;
+    const exactMatch = getExactVehicleMatch(vehicleType, value);
+    const nextSuggestions = getVehicleSuggestions(vehicleType, value);
+
+    setTripData((prev) => ({
+      ...prev,
+      vehicleModel: value,
+      fuelEfficiency:
+        value.trim().length === 0
+          ? String(getDefaultEfficiency(prev?.vehicleType ?? "car"))
+          : exactMatch
+            ? String(exactMatch.efficiency)
+            : prev.fuelEfficiency,
+    }));
+
+    setVehicleSuggestions(nextSuggestions);
+    setActiveField("vehicleModel");
+
+    if (errors.fuelEfficiency) {
+      setErrors((prev) => ({
+        ...prev,
+        fuelEfficiency: "",
+      }));
+    }
+  };
+
+  const handleVehicleSuggestionClick = (vehicle) => {
+    setTripData((prev) => ({
+      ...prev,
+      vehicleModel: vehicle.label,
+      fuelEfficiency: String(vehicle.efficiency),
+    }));
+
+    setVehicleSuggestions([]);
+    setActiveField(null);
 
     if (errors.fuelEfficiency) {
       setErrors((prev) => ({
@@ -87,13 +382,23 @@ function TripForm({
   };
 
   const clearField = (fieldName) => {
-    setTripData((prev) => ({
-      ...prev,
-      [fieldName]: "",
-    }));
+    if (fieldName === "vehicleModel") {
+      setTripData((prev) => ({
+        ...prev,
+        vehicleModel: "",
+        fuelEfficiency: String(getDefaultEfficiency(prev?.vehicleType ?? "car")),
+      }));
+      setVehicleSuggestions([]);
+      setActiveField(null);
+    } else {
+      setTripData((prev) => ({
+        ...prev,
+        [fieldName]: "",
+      }));
+    }
 
     if (fieldName === "origin" || fieldName === "destination") {
-      setSuggestions([]);
+      setPlaceSuggestions([]);
       setActiveField(fieldName);
     }
 
@@ -105,12 +410,12 @@ function TripForm({
     }
   };
 
-  const handleSuggestionClick = (fieldName, placeName) => {
+  const handlePlaceSuggestionClick = (fieldName, placeName) => {
     setTripData((prev) => ({
       ...prev,
       [fieldName]: placeName,
     }));
-    setSuggestions([]);
+    setPlaceSuggestions([]);
     setActiveField(null);
 
     if (errors[fieldName]) {
@@ -133,13 +438,16 @@ function TripForm({
   useEffect(() => {
     const currentValue =
       activeField === "origin"
-        ? tripData.origin
+        ? origin
         : activeField === "destination"
-        ? tripData.destination
-        : "";
+          ? destination
+          : "";
 
-    if (!activeField || currentValue.trim().length < 2) {
-      setSuggestions([]);
+    if (
+      (activeField !== "origin" && activeField !== "destination") ||
+      currentValue.trim().length < 2
+    ) {
+      setPlaceSuggestions([]);
       return;
     }
 
@@ -147,17 +455,17 @@ function TripForm({
       try {
         setIsFetchingSuggestions(true);
         const results = await getPlaceSuggestions(currentValue);
-        setSuggestions(results);
+        setPlaceSuggestions(results);
       } catch (error) {
         console.error(error);
-        setSuggestions([]);
+        setPlaceSuggestions([]);
       } finally {
         setIsFetchingSuggestions(false);
       }
     }, 400);
 
     return () => clearTimeout(timeoutId);
-  }, [tripData.origin, tripData.destination, activeField]);
+  }, [origin, destination, activeField]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -168,8 +476,23 @@ function TripForm({
         destinationRef.current &&
         !destinationRef.current.contains(event.target);
 
+      const clickedOutsideVehicleModel =
+        vehicleModelRef.current &&
+        !vehicleModelRef.current.contains(event.target);
+
       if (clickedOutsideOrigin && clickedOutsideDestination) {
-        setSuggestions([]);
+        setPlaceSuggestions([]);
+      }
+
+      if (clickedOutsideVehicleModel) {
+        setVehicleSuggestions([]);
+      }
+
+      if (
+        clickedOutsideOrigin &&
+        clickedOutsideDestination &&
+        clickedOutsideVehicleModel
+      ) {
         setActiveField(null);
       }
     };
@@ -208,7 +531,6 @@ function TripForm({
   }`;
 
   const errorTextClass = "mt-1 text-xs text-red-500";
-
   const labelClass = "mb-1 block text-[13px] font-semibold";
 
   const clearButtonClass = `absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full transition ${
@@ -216,6 +538,12 @@ function TripForm({
       ? "text-slate-200 hover:bg-slate-700 hover:text-white"
       : "text-slate-500 hover:bg-slate-200 hover:text-slate-900"
   }`;
+
+  const matchedTextClass = darkMode
+    ? "mt-1 text-xs text-emerald-300"
+    : "mt-1 text-xs text-emerald-700";
+
+  const mutedTextClass = darkMode ? "text-slate-400" : "text-slate-500";
 
   const formContent = (
     <>
@@ -229,7 +557,7 @@ function TripForm({
             <input
               type="text"
               name="origin"
-              value={tripData.origin}
+              value={origin}
               onChange={handleChange}
               onFocus={() => setActiveField("origin")}
               placeholder="e.g. Ilagan, Isabela"
@@ -237,7 +565,7 @@ function TripForm({
               autoComplete="off"
             />
 
-            {tripData.origin && (
+            {origin && (
               <button
                 type="button"
                 onClick={() => clearField("origin")}
@@ -264,17 +592,19 @@ function TripForm({
           {errors.origin && <p className={errorTextClass}>{errors.origin}</p>}
 
           {activeField === "origin" &&
-            (suggestions.length > 0 || isFetchingSuggestions) && (
+            (placeSuggestions.length > 0 || isFetchingSuggestions) && (
               <div className={dropdownClass}>
                 {isFetchingSuggestions ? (
                   <div className={dropdownItemClass}>Searching places...</div>
                 ) : (
-                  suggestions.map((place) => (
+                  placeSuggestions.map((place) => (
                     <button
                       key={place.id}
                       type="button"
                       className={dropdownItemClass}
-                      onClick={() => handleSuggestionClick("origin", place.name)}
+                      onClick={() =>
+                        handlePlaceSuggestionClick("origin", place.name)
+                      }
                     >
                       {place.name}
                     </button>
@@ -291,7 +621,7 @@ function TripForm({
             <input
               type="text"
               name="destination"
-              value={tripData.destination}
+              value={destination}
               onChange={handleChange}
               onFocus={() => setActiveField("destination")}
               placeholder="e.g. Tuguegarao City, Cagayan"
@@ -299,7 +629,7 @@ function TripForm({
               autoComplete="off"
             />
 
-            {tripData.destination && (
+            {destination && (
               <button
                 type="button"
                 onClick={() => clearField("destination")}
@@ -328,18 +658,18 @@ function TripForm({
           )}
 
           {activeField === "destination" &&
-            (suggestions.length > 0 || isFetchingSuggestions) && (
+            (placeSuggestions.length > 0 || isFetchingSuggestions) && (
               <div className={dropdownClass}>
                 {isFetchingSuggestions ? (
                   <div className={dropdownItemClass}>Searching places...</div>
                 ) : (
-                  suggestions.map((place) => (
+                  placeSuggestions.map((place) => (
                     <button
                       key={place.id}
                       type="button"
                       className={dropdownItemClass}
                       onClick={() =>
-                        handleSuggestionClick("destination", place.name)
+                        handlePlaceSuggestionClick("destination", place.name)
                       }
                     >
                       {place.name}
@@ -350,20 +680,99 @@ function TripForm({
             )}
         </div>
 
-        <div>
-          <label className={labelClass}>Vehicle Type</label>
-          <select
-            name="vehicleType"
-            value={tripData.vehicleType}
-            onChange={handleVehicleChange}
-            className={getInputClass("vehicleType")}
-          >
-            {vehicleOptions.map((vehicle) => (
-              <option key={vehicle.value} value={vehicle.value}>
-                {vehicle.label}
-              </option>
-            ))}
-          </select>
+        <div className="grid grid-cols-2 gap-3 md:col-span-2">
+          <div>
+            <label className={labelClass}>Vehicle Type</label>
+            <select
+              name="vehicleType"
+              value={vehicleType}
+              onChange={handleVehicleChange}
+              className={getInputClass("vehicleType")}
+            >
+              {vehicleOptions.map((vehicle) => (
+                <option key={vehicle.value} value={vehicle.value}>
+                  {vehicle.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div ref={vehicleModelRef} className="relative">
+            <label className={labelClass}>Vehicle Model</label>
+
+            <div className="relative">
+              <input
+                type="text"
+                name="vehicleModel"
+                value={vehicleModel}
+                onChange={handleVehicleModelChange}
+                onFocus={() => {
+                  setActiveField("vehicleModel");
+                  if (vehicleModel.trim()) {
+                    setVehicleSuggestions(
+                      getVehicleSuggestions(vehicleType, vehicleModel)
+                    );
+                  }
+                }}
+                placeholder="e.g. Vios"
+                className={getInputClass("vehicleModel", "pr-10")}
+                autoComplete="off"
+              />
+
+              {vehicleModel && (
+                <button
+                  type="button"
+                  onClick={() => clearField("vehicleModel")}
+                  className={clearButtonClass}
+                  aria-label="Clear vehicle model"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-4 w-4"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {activeField === "vehicleModel" &&
+              vehicleModel.trim() &&
+              !matchedVehicle &&
+              vehicleSuggestions.length > 0 && (
+                <div className={dropdownClass}>
+                  {vehicleSuggestions.map((vehicle) => (
+                    <button
+                      key={`${vehicle.label}-${vehicle.efficiency}`}
+                      type="button"
+                      className={dropdownItemClass}
+                      onClick={() => handleVehicleSuggestionClick(vehicle)}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span>{vehicle.label}</span>
+                        <span className={`text-xs ${mutedTextClass}`}>
+                          {vehicle.efficiency} km/L
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+            {matchedVehicle && (
+              <p className={matchedTextClass}>
+                Estimated {matchedVehicle.efficiency} km/L based on{" "}
+                {matchedVehicle.label}.
+              </p>
+            )}
+          </div>
         </div>
 
         <div>
@@ -373,7 +782,7 @@ function TripForm({
             <input
               type="number"
               name="fuelEfficiency"
-              value={tripData.fuelEfficiency}
+              value={fuelEfficiency}
               onChange={handleChange}
               placeholder="e.g. 14"
               min="1"
@@ -381,7 +790,7 @@ function TripForm({
               className={getInputClass("fuelEfficiency", "pr-10")}
             />
 
-            {tripData.fuelEfficiency && (
+            {fuelEfficiency && (
               <button
                 type="button"
                 onClick={() => clearField("fuelEfficiency")}
@@ -417,7 +826,7 @@ function TripForm({
             <input
               type="number"
               name="fuelPrice"
-              value={tripData.fuelPrice}
+              value={fuelPrice}
               onChange={handleChange}
               placeholder="e.g. 65"
               min="0"
@@ -425,7 +834,7 @@ function TripForm({
               className={getInputClass("fuelPrice", "pr-10")}
             />
 
-            {tripData.fuelPrice && (
+            {fuelPrice && (
               <button
                 type="button"
                 onClick={() => clearField("fuelPrice")}
@@ -449,7 +858,9 @@ function TripForm({
             )}
           </div>
 
-          {errors.fuelPrice && <p className={errorTextClass}>{errors.fuelPrice}</p>}
+          {errors.fuelPrice && (
+            <p className={errorTextClass}>{errors.fuelPrice}</p>
+          )}
         </div>
 
         <div className="md:col-span-2">

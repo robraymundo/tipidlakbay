@@ -254,15 +254,23 @@ function App() {
           }`}
         >
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-2.5">
-            <div>
-              <h1 className="text-xl font-bold md:text-2xl">TipidLakbay</h1>
-              <p
-                className={`mt-0.5 text-xs md:text-sm ${
-                  darkMode ? "text-slate-300" : "text-slate-600"
-                }`}
-              >
-                Smart trip budgeting in the midst of rising fuel prices.
-              </p>
+            <div className="flex items-center gap-3">
+              <img
+                src="/logo.png"
+                alt="TipidLakbay logo"
+                className="h-10 w-10 rounded-lg object-contain md:h-11 md:w-11"
+              />
+
+              <div>
+                <h1 className="text-xl font-bold md:text-2xl">TipidLakbay</h1>
+                <p
+                  className={`mt-0.5 text-xs md:text-sm ${
+                    darkMode ? "text-slate-300" : "text-slate-600"
+                  }`}
+                >
+                  Smart trip budgeting in the midst of rising fuel prices.
+                </p>
+              </div>
             </div>
 
             <button

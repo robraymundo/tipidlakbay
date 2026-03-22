@@ -82,6 +82,11 @@ const vehicleEfficiencyDatabase = {
       efficiency: 14,
       keywords: ["toyota corolla altis", "corolla altis", "altis"],
     },
+    {
+      label: "Honda Brio",
+      efficiency: 17,
+      keywords: ["honda brio", "brio"],
+    },
   ],
   suv: [
     {
@@ -698,7 +703,7 @@ function TripForm({
           </div>
 
           <div ref={vehicleModelRef} className="relative">
-            <label className={labelClass}>Vehicle Model</label>
+            <label className={labelClass}>Model</label>
 
             <div className="relative">
               <input
@@ -765,17 +770,10 @@ function TripForm({
                   ))}
                 </div>
               )}
-
-            {matchedVehicle && (
-              <p className={matchedTextClass}>
-                Estimated {matchedVehicle.efficiency} km/L based on{" "}
-                {matchedVehicle.label}.
-              </p>
-            )}
           </div>
         </div>
 
-        <div>
+        <div className="md:col-span-2">
           <label className={labelClass}>Fuel Efficiency (km/L)</label>
 
           <div className="relative">
@@ -817,9 +815,16 @@ function TripForm({
           {errors.fuelEfficiency && (
             <p className={errorTextClass}>{errors.fuelEfficiency}</p>
           )}
+
+          {matchedVehicle && (
+            <p className={matchedTextClass}>
+              Estimated {matchedVehicle.efficiency} km/L based on{" "}
+              {matchedVehicle.label}.
+            </p>
+          )}
         </div>
 
-        <div>
+        <div className="md:col-span-2">
           <label className={labelClass}>Fuel Price (PHP / L)</label>
 
           <div className="relative">

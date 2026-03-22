@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import TripForm from "./components/TripForm";
 import RouteCard from "./components/RouteCard";
 import CostSummary from "./components/CostSummary";
@@ -20,6 +20,8 @@ function App() {
     destination: null,
   });
   const [resultAnimationKey, setResultAnimationKey] = useState(0);
+
+  const summarySectionRef = useRef(null);
 
   const [tripData, setTripData] = useState({
     origin: "",
@@ -198,6 +200,22 @@ function App() {
     }
   }, [hasCalculated, displayRoutes, cheapestRouteId, selectedRouteId]);
 
+  useEffect(() => {
+    if (!hasCalculated || !resultAnimationKey || routeError) return;
+
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    if (!isMobile) return;
+
+    const timeoutId = window.setTimeout(() => {
+      summarySectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 220);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [hasCalculated, resultAnimationKey, routeError]);
+
   const selectedSummary = useMemo(() => {
     if (!hasCalculated) return null;
 
@@ -295,8 +313,9 @@ function App() {
 
             <div className="space-y-4">
               <div
+                ref={summarySectionRef}
+                className="scroll-mt-20"
                 key={`summary-${resultAnimationKey}`}
-                className="transition-all duration-300"
                 style={
                   hasCalculated
                     ? {
